@@ -26,8 +26,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
         primaryStage.setTitle("AddressApp");
-        this.primaryStage.getIcons()
-                .add(new Image("file:resources/images/address_book.png"));
+        this.primaryStage.getIcons().add(new Image("file:resources/images/title.png"));
         initRootLayout();
 
         showPersonOverview();
