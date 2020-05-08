@@ -19,3 +19,26 @@ initialize() 方法在fxml文件完成载入时被自动调用. 那时, 所有�
 ## Dialogs
 不推荐使用该包，JavaFX中已经继承对话框
 对话框使用：https://code.makery.ch/blog/javafx-dialogs-official/
+
+## Lambda语法： 类名::方法名
+注意是方法名哦，后面没有括号“()”哒。为啥不要括号，因为这样的是式子并不代表一定会调用这个方法。这种式子一般是用作Lambda表达式，Lambda有所谓懒加载嘛，不要括号就是说，看情况调用方法。
+这种[方法引用]或者说[双冒号运算]对应的参数类型是Function<T,R> T表示传入类型，R表示返回类型。
+```
+例如
+
+表达式:
+
+person -> person.getAge();
+
+可以替换成
+
+Person::getAge
+
+表达式
+
+() -> new HashMap<>();
+
+可以替换成
+
+HashMap::new
+```
