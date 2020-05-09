@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="viewer.view.PictureOverviewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="viewer.controller.PictureOverviewController">
    <children>
       <SplitPane dividerPositions="0.3193979933110368" layoutX="81.0" layoutY="56.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
@@ -17,7 +18,7 @@
                <children>
                   <BorderPane layoutX="47.0" layoutY="58.0" prefHeight="398.0" prefWidth="404.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <center>
-                        <FlowPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                        <FlowPane fx:id="previewPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
                      </center>
                      <bottom>
                         <AnchorPane prefHeight="21.0" prefWidth="404.0" BorderPane.alignment="CENTER">
@@ -50,10 +51,13 @@
                                     <Insets bottom="5.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
-                              <Label prefHeight="24.0" prefWidth="45.0" text="Label">
+                              <Label fx:id="pathLabel" prefHeight="23.0" prefWidth="300.0" text="Label" textFill="#4a4343">
                                  <HBox.margin>
                                     <Insets bottom="5.0" left="30.0" top="5.0" />
                                  </HBox.margin>
+                                 <font>
+                                    <Font name="Microsoft YaHei" size="14.0" />
+                                 </font>
                               </Label>
                            </children>
                         </HBox>

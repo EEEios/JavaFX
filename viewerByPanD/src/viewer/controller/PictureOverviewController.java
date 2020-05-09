@@ -1,11 +1,13 @@
-package viewer.view;
+package viewer.controller;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 import viewer.model.DirTreeItem;
@@ -25,11 +27,23 @@ public class PictureOverviewController {
     private Label stateLabel;
     @FXML
     private Button slidPlayButton;
+    @FXML
+    private Label pathLabel;
+    @FXML
+    private FlowPane previewPane;
+
+    protected SimpleObjectProperty<File> selectedDir;
+
+    public void setSelectedDir(File selectedDir) {
+        this.selectedDir.set(selectedDir);
+    }
 
     @FXML
     public void initialize() {
 
         initDirTree();
+        initTopOfPreview();
+
     }
 
     public void initDirTree() {
@@ -92,6 +106,7 @@ public class PictureOverviewController {
                 //newValue为选中值
                 //TODO 右侧页面要显示
                 System.out.println(newValue);
+                selectedDir.setValue(newValue.getValue());
             }
         });
 
@@ -115,5 +130,14 @@ public class PictureOverviewController {
 
     }
 
+    public void initTopOfPreview() {
+        selectedDir = new SimpleObjectProperty<File>();
+        selectedDir.addListener(new ChangeListener<File>() {
+            @Override
+            public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
+                pathLabel.setText(newValue.getPath());
+            }
+        });
+    }
 
 }
