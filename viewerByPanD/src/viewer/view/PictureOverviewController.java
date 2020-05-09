@@ -2,13 +2,10 @@ package viewer.view;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 import viewer.model.DirTreeItem;
@@ -44,7 +41,11 @@ public class PictureOverviewController {
         dirTree.setShowRoot(false);
         dirTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        //设置初始TreeView单元样式
+        //加载根节点的子节点，例如C:、D:..
+        for (TreeItem<File> item :  root.getChildren()) {
+            ((DirTreeItem) item).load();
+        }
+        //设置初始TreeView单元样式----------------------------------------------------------------------
         dirTree.setCellFactory(new Callback<TreeView<File>, TreeCell<File>>() {
             @Override
             public TreeCell<File> call(TreeView<File> param) {
@@ -55,7 +56,7 @@ public class PictureOverviewController {
                         setFont(new Font("Microsoft YaHei", 14.0));
                         if (!empty) {
                             ImageView icon = null;
-                            if (this.getTreeItem().isExpanded()) {
+                            if (!this.getTreeItem().isExpanded()) {
                                 if (((DirTreeItem) getTreeItem().getParent()).isRoot()) {
                                     icon = new ImageView(new Image("file:resources/images/portable-power-solid.png", 16, 16, true, true)); // 磁盘
                                 } else {
@@ -80,7 +81,7 @@ public class PictureOverviewController {
             }
         });
 
-        //选项选中事件
+        //选项选中事件----------------------------------------------------------------------
         dirTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<File>>() {
             @Override
             public void changed(ObservableValue<? extends TreeItem<File>> observable, TreeItem<File> oldValue,
@@ -94,6 +95,7 @@ public class PictureOverviewController {
             }
         });
 
+        //展开/收起事件----------------------------------------------------------------------
 //        //展开之后改变节点样式
 //        root.addEventHandler(DirTreeItem.<File>branchExpandedEvent(), new EventHandler<DirTreeItem.TreeModificationEvent<File>>() {
 //            @Override
@@ -111,10 +113,7 @@ public class PictureOverviewController {
 //            }
 //        });
 
-        //加载root下子节点
-
-        for (TreeItem<File> item :  root.getChildren()) {
-            ((DirTreeItem) item).load();
-        }
     }
+
+
 }
