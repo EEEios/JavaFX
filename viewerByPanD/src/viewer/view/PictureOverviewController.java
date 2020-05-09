@@ -2,6 +2,7 @@ package viewer.view;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -43,8 +44,7 @@ public class PictureOverviewController {
         dirTree.setShowRoot(false);
         dirTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-
-        //设置TreeView单元样式
+        //设置初始TreeView单元样式
         dirTree.setCellFactory(new Callback<TreeView<File>, TreeCell<File>>() {
             @Override
             public TreeCell<File> call(TreeView<File> param) {
@@ -55,9 +55,20 @@ public class PictureOverviewController {
                         setFont(new Font("Microsoft YaHei", 14.0));
                         if (!empty) {
                             ImageView icon = null;
-                            icon = new ImageView(new Image("file:resources/images/folder-solid.png", 20, 20, true, true)); // 磁盘
+                            if (this.getTreeItem().isExpanded()) {
+                                if (((DirTreeItem) getTreeItem().getParent()).isRoot()) {
+                                    icon = new ImageView(new Image("file:resources/images/portable-power-solid.png", 16, 16, true, true)); // 磁盘
+                                } else {
+                                    icon = new ImageView(new Image("file:resources/images/folder-solid.png", 16, 16, true, true)); // 磁盘
+                                }
+                            } else {
+                                if (((DirTreeItem) getTreeItem().getParent()).isRoot()) {
+                                    icon = new ImageView(new Image("file:resources/images/portable-power-solid (1).png", 16, 16, true, true)); // 磁盘
+                                } else {
+                                    icon = new ImageView(new Image("file:resources/images/folder-open-solid.png", 16, 16, true, true)); // 磁盘
+                                }
+                            }
                             setGraphic(icon);
-
                             String name = FileSystemView.getFileSystemView().getSystemDisplayName(item);
                             setText(name);
                         } else {
@@ -78,14 +89,30 @@ public class PictureOverviewController {
                     return;
                 }
                 //newValue为选中值
+                //TODO 右侧页面要显示
                 System.out.println(newValue);
-
-//                viewerPane.setSelectedFolder(newValue.getValue()); // 将选中目录设置到viewerPane
             }
-
         });
 
+//        //展开之后改变节点样式
+//        root.addEventHandler(DirTreeItem.<File>branchExpandedEvent(), new EventHandler<DirTreeItem.TreeModificationEvent<File>>() {
+//            @Override
+//            public void handle(DirTreeItem.TreeModificationEvent<File> event) {
+//
+//                System.out.println(event.getTreeItem().getValue()+"open");
+//            }
+//        });
+//
+//        //收起之后改变节点样式
+//        root.addEventHandler(DirTreeItem.<File>branchCollapsedEvent(), new EventHandler<DirTreeItem.TreeModificationEvent<File>>() {
+//            @Override
+//            public void handle(DirTreeItem.TreeModificationEvent<File> event) {
+//                System.out.println(event.getTreeItem().getValue()+"close");
+//            }
+//        });
+
         //加载root下子节点
+
         for (TreeItem<File> item :  root.getChildren()) {
             ((DirTreeItem) item).load();
         }

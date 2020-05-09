@@ -19,7 +19,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
         primaryStage.setTitle("AddressApp");
-        this.primaryStage.getIcons().add(new Image("file:resources/images/title.png"));
+        this.primaryStage.getIcons().add(new Image("file:resources/images/title4.png"));
         initRootLayout();
         showPictureOverview();
     }

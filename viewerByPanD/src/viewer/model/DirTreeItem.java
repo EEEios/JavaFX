@@ -15,6 +15,10 @@ public class DirTreeItem extends TreeItem<File> {
 
     private boolean isLoaded;
 
+    public boolean isRoot() {
+        return isRoot;
+    }
+
     public DirTreeItem(File file, boolean isRoot) {
         super(file);
         this.isRoot = isRoot;
@@ -40,7 +44,7 @@ public class DirTreeItem extends TreeItem<File> {
                 if (child.isDirectory() && (isRoot || !child.isHidden())) {
                     DirTreeItem item = new DirTreeItem(child,false);
 
-                    item.addEventHandler(DirTreeItem.branchCollapsedEvent(),
+                    item.addEventHandler(DirTreeItem.branchExpandedEvent(),
                             new EventHandler<TreeItem.TreeModificationEvent<File>>() {
                         @Override
                         public void handle(TreeModificationEvent<File> event) {
