@@ -1,5 +1,6 @@
 package viewer.controller;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -14,6 +15,7 @@ import viewer.model.DirTreeItem;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
+import java.io.FileFilter;
 
 /**
  * Created by PanD
@@ -22,17 +24,24 @@ import java.io.File;
 public class PictureOverviewController {
 
     @FXML
+    private FlowPane previewPane;
+
+    @FXML
     private TreeView<File> dirTree;
+
     @FXML
     private Label stateLabel;
     @FXML
+    private Label pathLabel;
+
+    @FXML
     private Button slidPlayButton;
     @FXML
-    private Label pathLabel;
-    @FXML
-    private FlowPane previewPane;
+    private Button backToParentFileButton;
 
     protected SimpleObjectProperty<File> selectedDir;
+
+    protected SimpleIntegerProperty selectedDirIndex;
 
     public void setSelectedDir(File selectedDir) {
         this.selectedDir.set(selectedDir);
@@ -42,10 +51,17 @@ public class PictureOverviewController {
     public void initialize() {
 
         initDirTree();
-        initTopOfPreview();
+        initPreview();
 
     }
 
+    //初始化-----------------------------------------------------------------------------------
+
+    /**
+     * description: 目录树的初始化
+     * @param
+     * @return void
+     */
     public void initDirTree() {
         DirTreeItem root = new DirTreeItem(new File("root"), true);
         root.load();
@@ -103,41 +119,69 @@ public class PictureOverviewController {
                 if (newValue == null) {
                     return;
                 }
-                //newValue为选中值
-                //TODO 右侧页面要显示
-                System.out.println(newValue);
-                selectedDir.setValue(newValue.getValue());
+                //observable.getValue().getValue()为选中的目录
+                System.out.println(observable.getValue().getValue());
+                setSelectedDir(observable.getValue().getValue());
             }
         });
-
-        //展开/收起事件----------------------------------------------------------------------
-//        //展开之后改变节点样式
-//        root.addEventHandler(DirTreeItem.<File>branchExpandedEvent(), new EventHandler<DirTreeItem.TreeModificationEvent<File>>() {
-//            @Override
-//            public void handle(DirTreeItem.TreeModificationEvent<File> event) {
-//
-//                System.out.println(event.getTreeItem().getValue()+"open");
-//            }
-//        });
-//
-//        //收起之后改变节点样式
-//        root.addEventHandler(DirTreeItem.<File>branchCollapsedEvent(), new EventHandler<DirTreeItem.TreeModificationEvent<File>>() {
-//            @Override
-//            public void handle(DirTreeItem.TreeModificationEvent<File> event) {
-//                System.out.println(event.getTreeItem().getValue()+"close");
-//            }
-//        });
 
     }
 
-    public void initTopOfPreview() {
+    /**
+     * description: 图片预览区域的初始化
+     * @param
+     * @return void
+     */
+    public void initPreview() {
         selectedDir = new SimpleObjectProperty<File>();
+
+        //对文件选择的监听
         selectedDir.addListener(new ChangeListener<File>() {
             @Override
             public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
-                pathLabel.setText(newValue.getPath());
+
+                File currentDir = observable.getValue();
+
+                //上方导航栏
+                pathLabel.setText(currentDir.getPath());
+                stateLabel.setText("加载中...");
+                //筛选对应的图片文件
+                File[] images = currentDir.listFiles(
+                        new FileFilter() {
+                            @Override
+                            public boolean accept(File pathname) {
+                                if (pathname.isFile()) {
+                                    String name = pathname.getName().toLowerCase();
+                                    if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
+                                            || name.endsWith(".png") || name.endsWith("bmp")) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        }
+                );
+                if (images != null) {
+                    stateLabel.setText(String.format("已加载 0 张 | 共 %d 张图片", images.length));
+                    previewPane.getChildren().clear();
+                }
             }
         });
+    }
+
+    private void loadPicture(File[] images) {
+        int count = 0;
+        for (File image : images) {
+
+        }
+    }
+
+    //按钮Action-------------------------------------------------------------------------------
+    public void backToParentDirectory() {
+        if (selectedDir.getValue().getParentFile() != null) {
+            setSelectedDir(selectedDir.getValue().getParentFile());
+            System.out.println("parent file:" + selectedDir.getValue().getPath());
+        }
     }
 
 }
