@@ -18,8 +18,6 @@ import viewer.model.ImagePreViewItem;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by PanD
@@ -63,7 +61,7 @@ public class PictureOverviewController {
         initPreview();
     }
 
-    //初始化-----------------------------------------------------------------------------------
+//初始化-----------------------------------------------------------------------------------
 
     /**
      * description: 目录树的初始化
@@ -143,7 +141,26 @@ public class PictureOverviewController {
     public void initPreview() {
         previewPane.prefWidthProperty().bind(scrollPane.widthProperty());
         pathLabel.setText("");
-        //对路径进行监听
+        pathLabelListener();
+        selectImageListener();
+    }
+
+    //载入当前目录的图片的缩略图
+    private void loadPicture(File[] images) {
+        imagePreViewSet.clear();
+        for (File image : images) {
+            ImagePreViewItem ipItem = new ImagePreViewItem(image, this);
+            imagePreViewSet.add(ipItem);
+
+            //在页面载入缩略图
+            this.getPreviewPane().getChildren().add(ipItem);
+        }
+    }
+
+
+//监听 ------------------------------------------------------------------------------------
+    //对路径进行监听
+    private void pathLabelListener() {
         selectedDir.addListener(new ChangeListener<File>() {
             @Override
             public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
@@ -173,6 +190,10 @@ public class PictureOverviewController {
                 loadPicture(images);
             }
         });
+    }
+
+    //对缩略图的选择/选中进行监听
+    private void selectImageListener() {
         selectedImagePreViewSet.addListener(new ChangeListener<ObservableSet<ImagePreViewItem>>() {
             @Override
             public void changed(ObservableValue<? extends ObservableSet<ImagePreViewItem>> observable, ObservableSet<ImagePreViewItem> oldValue, ObservableSet<ImagePreViewItem> newValue) {
@@ -187,24 +208,8 @@ public class PictureOverviewController {
         });
     }
 
-    //载入当前目录的图片的缩略图
-    private void loadPicture(File[] images) {
-        int count = 0;
-        imagePreViewSet.clear();
-        for (File image : images) {
-            ImagePreViewItem ipItem = new ImagePreViewItem(image, this);
-            imagePreViewSet.add(ipItem);
 
-            //在页面载入缩略图
-            this.getPreviewPane().getChildren().add(ipItem);
-            count++;
-
-            //更改说明
-            stateLabel.setText(String.format("共 %d 张图片 |", count, images.length));
-        }
-    }
-
-    //按钮Action  -----------------------------------------------------------------------------
+//按钮Action  -----------------------------------------------------------------------------
     //返回上级目录
     public void backToParentDirectory() {
         //没有选择目录时返回上级
@@ -218,14 +223,17 @@ public class PictureOverviewController {
         }
     }
 
-
-    //getter & setter ------------------------------------------------------------------------
+//getter & setter ------------------------------------------------------------------------
     public void setSelectedDir(File selectedDir) {
         this.selectedDir.set(selectedDir);
     }
 
     public FlowPane getPreviewPane() {
         return previewPane;
+    }
+
+    public ObservableSet<ImagePreViewItem> getImagePreViewSet() {
+        return imagePreViewSet.get();
     }
 
     public SimpleSetProperty<ImagePreViewItem> imagePreViewSetProperty() {
