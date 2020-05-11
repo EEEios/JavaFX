@@ -24,6 +24,11 @@ public class DirTreeItem extends TreeItem<File> {
         this.isRoot = isRoot;
     }
 
+    /**
+     * description: 加载当前节点的子节点
+     * @param
+     * @return void
+     */
     public void load() {
         if (!isLoaded) {
             isLoaded = true;

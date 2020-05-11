@@ -5,6 +5,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,6 +14,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 import viewer.model.DirTreeItem;
+import viewer.model.ImagePreViewItem;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -134,7 +137,7 @@ public class PictureOverviewController {
      */
     public void initPreview() {
         selectedDir = new SimpleObjectProperty<File>();
-
+        pathLabel.setText("");
         //对文件选择的监听
         selectedDir.addListener(new ChangeListener<File>() {
             @Override
@@ -142,29 +145,27 @@ public class PictureOverviewController {
 
                 File currentDir = observable.getValue();
 
-                //上方导航栏
+                //上方导航栏初变化
                 pathLabel.setText(currentDir.getPath());
-                stateLabel.setText("加载中...");
+
                 //筛选对应的图片文件
                 File[] images = currentDir.listFiles(
-                        new FileFilter() {
-                            @Override
-                            public boolean accept(File pathname) {
-                                if (pathname.isFile()) {
-                                    String name = pathname.getName().toLowerCase();
-                                    if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
-                                            || name.endsWith(".png") || name.endsWith("bmp")) {
-                                        return true;
-                                    }
+                        pathname -> {
+                            if (pathname.isFile()) {
+                                String name = pathname.getName().toLowerCase();
+                                if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
+                                        || name.endsWith(".png") || name.endsWith("bmp")) {
+                                    return true;
                                 }
-                                return false;
                             }
+                            return false;
                         }
                 );
-                if (images != null) {
-                    stateLabel.setText(String.format("已加载 0 张 | 共 %d 张图片", images.length));
-                    previewPane.getChildren().clear();
-                }
+                stateLabel.setText(String.format("已加载 0 张 | 共 %d 张图片", images.length));
+                previewPane.getChildren().clear();
+
+                //加载图片
+                loadPicture(images);
             }
         });
     }
@@ -172,16 +173,25 @@ public class PictureOverviewController {
     private void loadPicture(File[] images) {
         int count = 0;
         for (File image : images) {
-
+            ImagePreViewItem ipItem = new ImagePreViewItem(image, this.getPreviewPane());
+            this.getPreviewPane().getChildren().add(ipItem);
         }
     }
 
     //按钮Action-------------------------------------------------------------------------------
     public void backToParentDirectory() {
+        //没有选择目录时返回上级
+        if (selectedDir == null) {
+            return;
+        }
+        //选择目录返回上级时
         if (selectedDir.getValue().getParentFile() != null) {
             setSelectedDir(selectedDir.getValue().getParentFile());
             System.out.println("parent file:" + selectedDir.getValue().getPath());
         }
     }
 
+    public FlowPane getPreviewPane() {
+        return previewPane;
+    }
 }

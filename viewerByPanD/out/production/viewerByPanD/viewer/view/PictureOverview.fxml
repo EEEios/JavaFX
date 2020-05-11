@@ -18,12 +18,18 @@
                <children>
                   <BorderPane layoutX="47.0" layoutY="58.0" prefHeight="398.0" prefWidth="404.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <center>
-                        <FlowPane fx:id="previewPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+                        <FlowPane fx:id="previewPane" hgap="15.0" prefHeight="200.0" prefWidth="200.0" vgap="15.0" BorderPane.alignment="CENTER">
+                           <BorderPane.margin>
+                              <Insets />
+                           </BorderPane.margin>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding></FlowPane>
                      </center>
                      <bottom>
                         <AnchorPane prefHeight="21.0" prefWidth="404.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label fx:id="stateLabel" disable="true" prefHeight="21.0" prefWidth="90.0" text="Label" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                              <Label fx:id="stateLabel" disable="true" prefHeight="21.0" prefWidth="150.0" text="Label" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
                               <Button fx:id="slidPlayButton" layoutX="329.0" layoutY="8.0" mnemonicParsing="false" text="Button" AnchorPane.bottomAnchor="2.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="8.0" />
                            </children>
                         </AnchorPane>
