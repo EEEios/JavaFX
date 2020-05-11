@@ -26,13 +26,14 @@ public class ImagePreViewItem extends VBox {
 
     private PictureOverviewController pictureOverviewController;
 
-    //VBOX中的组件----------------
+//VBOX中的组件 -------------------------------------------------------------------
     private Canvas canvas;
 
     private Label nameLabel;
 
     private SimpleBooleanProperty isSelected;
 
+//初始化 -------------------------------------------------------------------
     public ImagePreViewItem(File imageFile, PictureOverviewController pictureOverviewController) {
         super();
         this.setHeight(ImagePreviewConstant.VBOX_HEIGHT);
@@ -155,6 +156,7 @@ public class ImagePreViewItem extends VBox {
         });
     }
 
+//getter & setter -------------------------------------------------------------------
     public boolean isIsSelected() {
         return isSelected.get();
     }

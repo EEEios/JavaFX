@@ -51,6 +51,8 @@ public class PictureOverviewController {
     //当前目录载入的缩略图
     private SimpleSetProperty<ImagePreViewItem> imagePreViewSet;
     private SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSet;
+
+//初始化-----------------------------------------------------------------------------------
     @FXML
     public void initialize() {
         this.imagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
@@ -60,8 +62,6 @@ public class PictureOverviewController {
         initDirTree();
         initPreview();
     }
-
-//初始化-----------------------------------------------------------------------------------
 
     /**
      * description: 目录树的初始化
@@ -145,7 +145,11 @@ public class PictureOverviewController {
         selectImageListener();
     }
 
-    //载入当前目录的图片的缩略图
+    /**
+     * description: 载入当前目录的图片的缩略图
+     * @param images
+     * @return void
+     */
     private void loadPicture(File[] images) {
         imagePreViewSet.clear();
         for (File image : images) {
@@ -159,7 +163,11 @@ public class PictureOverviewController {
 
 
 //监听 ------------------------------------------------------------------------------------
-    //对路径进行监听
+    /**
+     * description: 对路径进行监听
+     * @param
+     * @return void
+     */
     private void pathLabelListener() {
         selectedDir.addListener(new ChangeListener<File>() {
             @Override
@@ -192,7 +200,11 @@ public class PictureOverviewController {
         });
     }
 
-    //对缩略图的选择/选中进行监听
+    /**
+     * description: 对缩略图的选择/选中进行监听
+     * @param
+     * @return void
+     */
     private void selectImageListener() {
         selectedImagePreViewSet.addListener(new ChangeListener<ObservableSet<ImagePreViewItem>>() {
             @Override
@@ -210,7 +222,11 @@ public class PictureOverviewController {
 
 
 //按钮Action  -----------------------------------------------------------------------------
-    //返回上级目录
+    /**
+     * description: 返回上级目录
+     * @param
+     * @return void
+     */
     public void backToParentDirectory() {
         //没有选择目录时返回上级
         if (selectedDir == null) {
