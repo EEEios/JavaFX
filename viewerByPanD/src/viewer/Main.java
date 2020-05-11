@@ -46,7 +46,6 @@ public class Main extends Application {
             loader.setLocation(Main.class.getResource("view/PictureOverview.fxml"));
             AnchorPane pictureOverview = (AnchorPane) loader.load();
 
-//            AnchorPane pictureOverview = FXMLLoader.load(Main.class.getResource("view/PictureOverview.fxml"));
             rootLayout.setCenter(pictureOverview);
         } catch (IOException e) {
             e.printStackTrace();

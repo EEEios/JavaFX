@@ -1,13 +1,12 @@
 package viewer.controller;
 
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,7 +18,8 @@ import viewer.model.ImagePreViewItem;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
-import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by PanD
@@ -35,8 +35,10 @@ public class PictureOverviewController {
     @FXML
     private TreeView<File> dirTree;
 
+    //页面下方说明选中的Label
     @FXML
     private Label stateLabel;
+    //路径导航栏的Label
     @FXML
     private Label pathLabel;
 
@@ -45,19 +47,20 @@ public class PictureOverviewController {
     @FXML
     private Button backToParentFileButton;
 
-    protected SimpleObjectProperty<File> selectedDir;
+    //被选中的目录
+    private SimpleObjectProperty<File> selectedDir;
 
-    protected SimpleIntegerProperty selectedDirIndex;
-
-    public void setSelectedDir(File selectedDir) {
-        this.selectedDir.set(selectedDir);
-    }
-
+    //当前目录载入的缩略图
+    private SimpleSetProperty<ImagePreViewItem> imagePreViewSet;
+    private SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSet;
     @FXML
     public void initialize() {
+        this.imagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
+        this.selectedImagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
+        this.selectedDir = new SimpleObjectProperty<File>();
+
         initDirTree();
         initPreview();
-
     }
 
     //初始化-----------------------------------------------------------------------------------
@@ -139,10 +142,8 @@ public class PictureOverviewController {
      */
     public void initPreview() {
         previewPane.prefWidthProperty().bind(scrollPane.widthProperty());
-
-        selectedDir = new SimpleObjectProperty<File>();
         pathLabel.setText("");
-        //对文件选择的监听
+        //对路径进行监听
         selectedDir.addListener(new ChangeListener<File>() {
             @Override
             public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
@@ -165,26 +166,46 @@ public class PictureOverviewController {
                             return false;
                         }
                 );
-                stateLabel.setText(String.format("已加载 0 张 | 共 %d 张图片", images.length));
+                stateLabel.setText(String.format("共 %d 张图片 |", images.length));
                 previewPane.getChildren().clear();
 
                 //加载图片
                 loadPicture(images);
             }
         });
+        selectedImagePreViewSet.addListener(new ChangeListener<ObservableSet<ImagePreViewItem>>() {
+            @Override
+            public void changed(ObservableValue<? extends ObservableSet<ImagePreViewItem>> observable, ObservableSet<ImagePreViewItem> oldValue, ObservableSet<ImagePreViewItem> newValue) {
+                int selected = PictureOverviewController.this.selectedImagePreViewSetProperty().size();
+                if (selected == 0){
+                    stateLabel.setText(String.format("共 %d 张图片 |",PictureOverviewController.this.imagePreViewSetProperty().size()));
+                } else {
+                    stateLabel.setText(String.format("共 %d 张图片 | %d 张被选中 |",PictureOverviewController.this.imagePreViewSetProperty().size(), selected));
+                }
+
+            }
+        });
     }
 
+    //载入当前目录的图片的缩略图
     private void loadPicture(File[] images) {
         int count = 0;
+        imagePreViewSet.clear();
         for (File image : images) {
-            ImagePreViewItem ipItem = new ImagePreViewItem(image, this.getPreviewPane());
+            ImagePreViewItem ipItem = new ImagePreViewItem(image, this);
+            imagePreViewSet.add(ipItem);
+
+            //在页面载入缩略图
             this.getPreviewPane().getChildren().add(ipItem);
             count++;
-            stateLabel.setText(String.format("已加载 %d 张 | 共 %d 张图片", count, images.length));
+
+            //更改说明
+            stateLabel.setText(String.format("共 %d 张图片 |", count, images.length));
         }
     }
 
-    //按钮Action-------------------------------------------------------------------------------
+    //按钮Action  -----------------------------------------------------------------------------
+    //返回上级目录
     public void backToParentDirectory() {
         //没有选择目录时返回上级
         if (selectedDir == null) {
@@ -193,11 +214,31 @@ public class PictureOverviewController {
         //选择目录返回上级时
         if (selectedDir.getValue().getParentFile() != null) {
             setSelectedDir(selectedDir.getValue().getParentFile());
-            System.out.println("parent file:" + selectedDir.getValue().getPath());
+//            System.out.println("parent file:" + selectedDir.getValue().getPath());
         }
+    }
+
+
+    //getter & setter ------------------------------------------------------------------------
+    public void setSelectedDir(File selectedDir) {
+        this.selectedDir.set(selectedDir);
     }
 
     public FlowPane getPreviewPane() {
         return previewPane;
     }
+
+    public SimpleSetProperty<ImagePreViewItem> imagePreViewSetProperty() {
+        return imagePreViewSet;
+    }
+
+    public ObservableSet<ImagePreViewItem> getSelectedImagePreViewSet() {
+        return selectedImagePreViewSet.get();
+    }
+
+    public SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSetProperty() {
+        return selectedImagePreViewSet;
+    }
+
+
 }

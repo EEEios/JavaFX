@@ -12,5 +12,4 @@ public interface ImagePreviewConstant {
     double VBOX_HEIGHT = 140;
     double VBOX_WIDTH = 140;
 
-
 }

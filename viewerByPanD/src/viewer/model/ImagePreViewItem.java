@@ -1,18 +1,17 @@
 package viewer.model;
 
-import javafx.event.EventHandler;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import viewer.constants.ImagePreviewConstant;
+import viewer.controller.PictureOverviewController;
 
 import java.io.File;
 
@@ -24,19 +23,26 @@ public class ImagePreViewItem extends VBox {
 
     private File imageFile;
 
-    private FlowPane parentPane;
+    private PictureOverviewController pictureOverviewController;
+
+    //VBOX中的组件----------------
+    private Canvas canvas;
 
     private Label nameLabel;
 
-    private Canvas canvas;
+    private boolean isSelected;
 
-    public ImagePreViewItem(File imageFile, FlowPane parentPane) {
+    public ImagePreViewItem(File imageFile, PictureOverviewController pictureOverviewController) {
         super();
-        this.imageFile = imageFile;
-        this.parentPane = parentPane;
-        nameLabel = new Label();
         this.setHeight(ImagePreviewConstant.VBOX_HEIGHT);
         this.setWidth(ImagePreviewConstant.VBOX_WIDTH);
+
+        this.imageFile = imageFile;
+        this.pictureOverviewController = pictureOverviewController;
+
+        nameLabel = new Label();
+        isSelected = false;
+
         initImagePreview();
         initMouseEvent();
     }
@@ -80,20 +86,52 @@ public class ImagePreViewItem extends VBox {
         this.setOnMouseEntered(event -> {
             //内部类方法使用外部类，需要使用 外部类名.this 进行映射
 //            渐变使用：ImagePreViewItem.this.setStyle("-fx-background-color:linear-gradient(to bottom,#000000 1%,  #ffffff 98%);");
-            ImagePreViewItem.this.setStyle("-fx-background-color:#A2A2A2;");
+            if (isSelected() == false) {
+                ImagePreViewItem.this.setStyle("-fx-background-color:#A2A2A2;");
+            }
         });
 
         //离开
         this.setOnMouseExited(event -> {
-            ImagePreViewItem.this.setStyle("-fx-background-color:transparent;");
-        });
-
-        //TODO 选中
-        this.setOnMouseClicked(event -> {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                System.out.println("选中了");
-                ImagePreViewItem.this.setStyle("-fx-background-color:#A2A2A2;");
+            if (isSelected() == false) {
+                ImagePreViewItem.this.setStyle("-fx-background-color:transparent;");
             }
         });
+
+        //选中
+        this.setOnMouseClicked(event -> {
+            if (event.getButton() == MouseButton.PRIMARY) {
+                //取消其他选中状态
+                if (event.isControlDown()) {
+                } else {
+
+                    if (event.getClickCount() == 1 && event.getButton() == MouseButton.PRIMARY) {
+                        if (isSelected() == false) {
+                            setSelected(true);
+                            ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
+                            ImagePreViewItem.this.setStyle("-fx-background-color:#A2A2A2;");
+                        } else {
+                            setSelected(false);
+                            ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().remove(ImagePreViewItem.this);
+                            ImagePreViewItem.this.setStyle("-fx-background-color:transparent;");
+                        }
+                    }
+                    if (event.getClickCount() == 1 && event.getButton() == MouseButton.SECONDARY) {
+
+                    }
+                    if (event.getClickCount() >= 2 && event.getButton() == MouseButton.PRIMARY) {
+
+                    }
+                }
+            }
+        });
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
     }
 }
