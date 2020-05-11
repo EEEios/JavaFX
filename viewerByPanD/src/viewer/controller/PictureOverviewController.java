@@ -1,5 +1,6 @@
 package viewer.controller;
 
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -28,6 +29,8 @@ public class PictureOverviewController {
 
     @FXML
     private FlowPane previewPane;
+    @FXML
+    private ScrollPane scrollPane;
 
     @FXML
     private TreeView<File> dirTree;
@@ -52,7 +55,6 @@ public class PictureOverviewController {
 
     @FXML
     public void initialize() {
-
         initDirTree();
         initPreview();
 
@@ -136,6 +138,8 @@ public class PictureOverviewController {
      * @return void
      */
     public void initPreview() {
+        previewPane.prefWidthProperty().bind(scrollPane.widthProperty());
+
         selectedDir = new SimpleObjectProperty<File>();
         pathLabel.setText("");
         //对文件选择的监听
@@ -175,6 +179,8 @@ public class PictureOverviewController {
         for (File image : images) {
             ImagePreViewItem ipItem = new ImagePreViewItem(image, this.getPreviewPane());
             this.getPreviewPane().getChildren().add(ipItem);
+            count++;
+            stateLabel.setText(String.format("已加载 %d 张 | 共 %d 张图片", count, images.length));
         }
     }
 

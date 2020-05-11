@@ -7,6 +7,10 @@ package viewer.constants;
 
 public interface ImagePreviewConstant {
 
-    double VBOX_HEIGHT = 120;
-    double VBOX_WIDTH = 120;
+    //缩略图大小常量
+    //缩略图为VBOX，为上下两部分，分别为canvas和label
+    double VBOX_HEIGHT = 140;
+    double VBOX_WIDTH = 140;
+
+
 }

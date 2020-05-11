@@ -18,7 +18,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        primaryStage.setTitle("AddressApp");
+        primaryStage.setTitle("Picture Viewer");
         this.primaryStage.getIcons().add(new Image("file:resources/images/title.png"));
         initRootLayout();
         showPictureOverview();
