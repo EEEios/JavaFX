@@ -1,13 +1,12 @@
 package viewer.controller;
 
-import javafx.beans.property.SimpleSetProperty;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import viewer.model.ImagePreViewItem;
 
-import java.awt.*;
+import java.io.File;
+import java.util.List;
 
 /**
  * Created by PanD
@@ -32,15 +31,19 @@ public class ImageViewController {
     @FXML
     private ImageView imageView;
 
-    private SimpleSetProperty<ImagePreViewItem> ImageList;
+    private List<File> ImageList;
 
+
+
+    @FXML
+    public void initialize() {
+
+    }
 //构造器 ------------------------------------------------
-    public ImageViewController(SimpleSetProperty<ImagePreViewItem> imageList) {
+    public ImageViewController(List<File> imageList) {
         ImageList = imageList;
     }
 
 //getter & setter --------------------------------------------------------------
-    public void setImageList(ObservableSet<ImagePreViewItem> imageList) {
-        this.ImageList.set(imageList);
-    }
+
 }

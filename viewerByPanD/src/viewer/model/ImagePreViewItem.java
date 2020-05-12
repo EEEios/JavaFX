@@ -14,6 +14,7 @@ import javafx.scene.layout.VBox;
 import viewer.constants.ImagePreviewConstant;
 import viewer.controller.ImageViewController;
 import viewer.controller.PictureOverviewController;
+import viewer.utils.ConvertUtil;
 
 import java.io.File;
 
@@ -120,10 +121,11 @@ public class ImagePreViewItem extends VBox {
                 }
             }
 
-            //双击左键
+            //双击左键(打开当前目录全部图片
             if (event.getClickCount() == 2 && (event.getButton() == MouseButton.PRIMARY)) {
-                //传入选中的图片
-                parentController.imageViewSerivce.openImageViewStage(parentController.selectedImagePreViewSetProperty());
+                parentController.imageViewSerivce.openImageViewStage(
+                        ConvertUtil.simpleSetPropertyToList(parentController.imagePreViewSetProperty())
+                );
             }
 
             //右键

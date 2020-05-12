@@ -12,7 +12,9 @@ import viewer.controller.ImageViewController;
 import viewer.model.ImagePreViewItem;
 import viewer.service.ImageViewSerivce;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by PanD
@@ -21,7 +23,7 @@ import java.io.IOException;
 public class ImageViewSerivceImpl implements ImageViewSerivce {
 
     @Override
-    public void openImageViewStage(SimpleSetProperty<ImagePreViewItem> imageList) {
+    public void openImageViewStage(List<File> imageList) {
         Stage imagerViewStage = new Stage();
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));

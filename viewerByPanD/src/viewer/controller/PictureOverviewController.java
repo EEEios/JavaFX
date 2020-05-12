@@ -343,18 +343,8 @@ public class PictureOverviewController {
     }
 
 //工具方法 --------------------------------------------------------------------------------------
-    /**
-     * description: 将propertySet转为List，提取其中的File
-     * @param selectedImagePreViewSet
-     * @return java.util.List<java.io.File>
-     */
-    private List<File> simpleSetPropertyToList(SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSet) {
-        List<File> fileList = new ArrayList<>();
-        selectedImagePreViewSet.forEach(imagePreViewItem -> {
-            fileList.add(imagePreViewItem.getImageFile());
-        });
-        return fileList;
-    }
+
+
 
 
 //getter & setter ------------------------------------------------------------------------
