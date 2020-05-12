@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import viewer.constants.ImagePreviewConstant;
+import viewer.controller.ImageViewController;
 import viewer.controller.PictureOverviewController;
 
 import java.io.File;
@@ -102,7 +103,7 @@ public class ImagePreViewItem extends VBox {
 
         //选中
         this.setOnMouseClicked(event -> {
-
+            PictureOverviewController parentController = ImagePreViewItem.this.pictureOverviewController;
             //左键
             if (event.getClickCount() == 1 && (event.getButton() == MouseButton.PRIMARY)) {
                 //没有ctrl进行多选
@@ -112,21 +113,26 @@ public class ImagePreViewItem extends VBox {
                 //单击，会取消掉其他的选择状态
                 if (isIsSelected() == false) {
                     setIsSelected(true);
-                    ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
+                    parentController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
                 } else {
                     setIsSelected(false);
-                    ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().remove(ImagePreViewItem.this);
+                    parentController.selectedImagePreViewSetProperty().remove(ImagePreViewItem.this);
                 }
+            }
+
+            //双击左键
+            if (event.getClickCount() == 2 && (event.getButton() == MouseButton.PRIMARY)) {
+                //传入选中的图片
+                parentController.imageViewSerivce.openImageViewStage(parentController.selectedImagePreViewSetProperty());
             }
 
             //右键
             if (event.getClickCount() == 1 && event.getButton() == MouseButton.SECONDARY) {
                 //右键点击的地方不是选中的文件则相当于 鼠标左键单击后右键打开菜单
-                if (ImagePreViewItem.this.pictureOverviewController
-                        .selectedImagePreViewSetProperty().contains(event.getSource()) == false){
+                if (parentController.selectedImagePreViewSetProperty().contains(event.getSource()) == false){
                     clearAllSelected();
                     setIsSelected(true);
-                    ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
+                    parentController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
                 }
             }
         });

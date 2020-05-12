@@ -18,6 +18,7 @@ import javafx.util.Callback;
 import viewer.model.DirTreeItem;
 import viewer.model.ImagePreViewItem;
 import viewer.service.ContextMenuService;
+import viewer.service.ImageViewSerivce;
 import viewer.service.ServiceFactory;
 
 import javax.swing.filechooser.FileSystemView;
@@ -32,6 +33,8 @@ import java.util.List;
 public class PictureOverviewController {
 
     public ContextMenuService contextMenuService = ServiceFactory.getContextMenuService();
+    public ImageViewSerivce imageViewSerivce = ServiceFactory.getImageViewSerivce();
+
 
     @FXML
     private FlowPane previewPane;
@@ -185,7 +188,6 @@ public class PictureOverviewController {
         }
     }
 
-
 //监听 ------------------------------------------------------------------------------------
     /**
      * description: 对路径进行监听
@@ -272,7 +274,7 @@ public class PictureOverviewController {
     }
 
 
-//按钮/菜单Action (为 public 以便 fxml 能够读取) -----------------------------------------------------------------------------
+//按钮/菜单Action (为 public 以便 fxml 能够读取) ------------------------------------------------------
     /**
      * description: 按钮：返回上级目录
      * @param
@@ -304,26 +306,43 @@ public class PictureOverviewController {
     }
 
     /**
-     * description: rename
+     * description: 重命名文件
      * @param
      * @return void
      */
     public void menuItemOfRename(List<File> fileList) {
         contextMenuService.rename(fileList);
+
     }
 
+    /**
+     * description: 复制文件
+     * @param
+     * @return void
+     */
     public void menuItemOfCopy(List<File> fileList) {
         contextMenuService.copy(fileList);
     }
 
+    /**
+     * description: 粘贴文件
+     * @param
+     * @return void
+     */
     public void menuItemOfPaste(String path) {
         contextMenuService.paste(stateLabel.getText());
     }
 
+    /**
+     * description: 剪切文件
+     * @param
+     * @return void
+     */
     public void menuItemOfCut(List<File> fileList) {
         contextMenuService.cut(fileList);
     }
-//工具方法
+
+//工具方法 --------------------------------------------------------------------------------------
     /**
      * description: 将propertySet转为List，提取其中的File
      * @param selectedImagePreViewSet
