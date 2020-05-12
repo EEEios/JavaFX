@@ -125,7 +125,7 @@ public class ImagePreViewItem extends VBox {
                 }
             }
 
-            //打开图片
+            //TODO 双击打开图片
             if (event.getClickCount() >= 2 && event.getButton() == MouseButton.PRIMARY) {
                 System.out.println("点了两次了");
             }

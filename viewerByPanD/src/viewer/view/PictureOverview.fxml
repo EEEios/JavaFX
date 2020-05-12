@@ -78,6 +78,17 @@
                                  </padding>
                               </AnchorPane>
                            </content>
+                           <contextMenu>
+                              <ContextMenu fx:id="contextMenu">
+                                <items>
+                                  <MenuItem fx:id="copyMenuItem" mnemonicParsing="false" text="复制" />
+                                    <MenuItem fx:id="cutMenuItem" mnemonicParsing="false" text="剪切" />
+                                    <MenuItem fx:id="renameMenuItem" mnemonicParsing="false" text="重命名" />
+                                    <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="粘贴" />
+                                    <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="全选" />
+                                </items>
+                              </ContextMenu>
+                           </contextMenu>
                         </ScrollPane>
                      </center>
                   </BorderPane>

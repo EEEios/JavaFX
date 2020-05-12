@@ -10,6 +10,6 @@ import javafx.stage.Stage;
 public interface ImageViewSerivce {
 
     //打开查看图片页面
-    void createImageViewStage();
+    Stage createImageViewStage();
 
 }

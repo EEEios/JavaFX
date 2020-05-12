@@ -11,10 +11,11 @@ import viewer.service.ImageViewSerivce;
 public class ImageViewSerivceImpl implements ImageViewSerivce {
 
     @Override
-    public void createImageViewStage() {
+    public Stage createImageViewStage() {
         Stage imagerViewStage = new Stage();
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
+        return imagerViewStage;
     }
 
 }

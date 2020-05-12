@@ -7,9 +7,11 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
@@ -29,9 +31,23 @@ public class PictureOverviewController {
     private FlowPane previewPane;
     @FXML
     private ScrollPane scrollPane;
-
+    //目录树
     @FXML
     private TreeView<File> dirTree;
+    //上下文菜单
+    @FXML
+    private ContextMenu contextMenu;
+
+    @FXML
+    private MenuItem copyMenuItem;
+    @FXML
+    private MenuItem cutMenuItem;
+    @FXML
+    private MenuItem pasteMenuItem;
+    @FXML
+    private MenuItem renameMenuItem;
+    @FXML
+    private MenuItem selectAllMenuItem;
 
     //页面下方说明选中的Label
     @FXML
@@ -39,9 +55,10 @@ public class PictureOverviewController {
     //路径导航栏的Label
     @FXML
     private Label pathLabel;
-
+    //幻灯片播放
     @FXML
     private Button slidPlayButton;
+    //返回上级目录
     @FXML
     private Button backToParentFileButton;
 
@@ -55,6 +72,7 @@ public class PictureOverviewController {
 //初始化-----------------------------------------------------------------------------------
     @FXML
     public void initialize() {
+
         this.imagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
         this.selectedImagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
         this.selectedDir = new SimpleObjectProperty<File>();
@@ -201,18 +219,34 @@ public class PictureOverviewController {
     }
 
     /**
-     * description: 对缩略图的选择/选中进行监听
+     * description: 对预览图片区域鼠标事件的监听
      * @param
      * @return void
      */
     private void selectImageListener() {
         //点击空白位置
         previewPane.setOnMouseClicked(event -> {
-            if (event.getPickResult().getIntersectedNode() == previewPane){
-                PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
-                    image.setIsSelected(false);
-                });
-                PictureOverviewController.this.getSelectedImagePreViewSet().clear();
+            if (event.getPickResult().getIntersectedNode() == previewPane) {
+                if (event.getButton() == MouseButton.PRIMARY){
+                    //点击左键取消掉所有选中
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
+                            image.setIsSelected(false);
+                        });
+                        PictureOverviewController.this.getSelectedImagePreViewSet().clear();
+                    }
+                }
+                if (event.getButton() == MouseButton.SECONDARY){
+                    contextMenu.getItems().clear();
+                    contextMenu.getItems().addAll(pasteMenuItem, selectAllMenuItem);
+                    contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
+                }
+            } else {
+                if (event.getButton() == MouseButton.SECONDARY){
+                    contextMenu.getItems().clear();
+                    contextMenu.getItems().addAll(copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, selectAllMenuItem);
+                    contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
+                }
             }
         });
 
@@ -239,7 +273,7 @@ public class PictureOverviewController {
      */
     public void backToParentDirectory() {
         //没有选择目录时返回上级
-        if (selectedDir == null) {
+        if (selectedDir == null || selectedDir.getValue() == null) {
             return;
         }
         //选择目录返回上级时
