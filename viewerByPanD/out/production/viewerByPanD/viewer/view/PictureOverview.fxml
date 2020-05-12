@@ -85,7 +85,7 @@
                                     <MenuItem fx:id="cutMenuItem" mnemonicParsing="false" text="剪切" />
                                     <MenuItem fx:id="renameMenuItem" mnemonicParsing="false" text="重命名" />
                                     <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="粘贴" />
-                                    <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="全选" />
+                                    <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" onAction="#menuItemOfSelectAll" text="全选" />
                                 </items>
                               </ContextMenu>
                            </contextMenu>

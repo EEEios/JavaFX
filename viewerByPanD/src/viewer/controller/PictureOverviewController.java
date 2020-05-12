@@ -20,6 +20,8 @@ import viewer.model.ImagePreViewItem;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by PanD
@@ -265,9 +267,9 @@ public class PictureOverviewController {
     }
 
 
-//按钮Action  -----------------------------------------------------------------------------
+//按钮/菜单Action (为 public 以便 fxml 能够读取) -----------------------------------------------------------------------------
     /**
-     * description: 返回上级目录
+     * description: 按钮：返回上级目录
      * @param
      * @return void
      */
@@ -282,6 +284,43 @@ public class PictureOverviewController {
 //            System.out.println("parent file:" + selectedDir.getValue().getPath());
         }
     }
+
+    /**
+     * description: 右键菜单：全选
+     * @param
+     * @return void
+     */
+    public void menuItemOfSelectAll() {
+        selectedImagePreViewSet.clear();
+        imagePreViewSet.forEach(imagePreViewItem -> {
+            imagePreViewItem.setIsSelected(true);
+            selectedImagePreViewSet.add(imagePreViewItem);
+        });
+    }
+
+    /**
+     * description: rename
+     * @param
+     * @return void
+     */
+    public void menuItemOfRename() {
+
+    }
+
+//工具方法
+    /**
+     * description: 将propertySet转为List，提取其中的File
+     * @param selectedImagePreViewSet
+     * @return java.util.List<java.io.File>
+     */
+    private List<File> simpleSetPropertyToList(SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSet) {
+        List<File> fileList = new ArrayList<>();
+        selectedImagePreViewSet.forEach(imagePreViewItem -> {
+            fileList.add(imagePreViewItem.getImageFile());
+        });
+        return fileList;
+    }
+
 
 //getter & setter ------------------------------------------------------------------------
     public void setSelectedDir(File selectedDir) {

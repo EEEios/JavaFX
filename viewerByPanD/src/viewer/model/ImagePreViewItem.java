@@ -103,17 +103,10 @@ public class ImagePreViewItem extends VBox {
         //选中
         this.setOnMouseClicked(event -> {
             //左键对应操作
-            if (event.getClickCount() == 1 && event.getButton() == MouseButton.PRIMARY) {
+            if (event.getClickCount() == 1 && (event.getButton() == MouseButton.PRIMARY)) {
                 //没有ctrl进行多选
                 if (event.isControlDown() == false) {
-                    //清除所有选中的图片
-                    ImagePreViewItem.this.pictureOverviewController
-                            .selectedImagePreViewSetProperty().clear();
-                    //将所有图片设置为 未选中
-                    ImagePreViewItem.this.pictureOverviewController
-                            .getImagePreViewSet().forEach(loadedImage -> {
-                        loadedImage.setIsSelected(false);
-                    });
+                    clearAllSelected();
                 }
                 //单击，会取消掉其他的选择状态
                 if (isIsSelected() == false) {
@@ -130,9 +123,15 @@ public class ImagePreViewItem extends VBox {
                 System.out.println("点了两次了");
             }
 
-            //右键菜单
+            //右键
             if (event.getClickCount() == 1 && event.getButton() == MouseButton.SECONDARY) {
-
+                //右键点击的地方不是选中的文件则相当于 鼠标左键单击后右键打开菜单
+                if (ImagePreViewItem.this.pictureOverviewController
+                        .selectedImagePreViewSetProperty().contains(event.getSource()) == false){
+                    clearAllSelected();
+                    setIsSelected(true);
+                    ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
+                }
             }
         });
     }
@@ -156,6 +155,22 @@ public class ImagePreViewItem extends VBox {
         });
     }
 
+    /**
+     * description: 清除当前选中的图片
+     * @param
+     * @return void
+     */
+    private void clearAllSelected() {
+        //清空选择
+        ImagePreViewItem.this.pictureOverviewController
+                .selectedImagePreViewSetProperty().clear();
+        //将所有图片设置为 未选中
+        ImagePreViewItem.this.pictureOverviewController
+                .getImagePreViewSet().forEach(loadedImage -> {
+            loadedImage.setIsSelected(false);
+        });
+    }
+
 //getter & setter -------------------------------------------------------------------
     public boolean isIsSelected() {
         return isSelected.get();
@@ -167,5 +182,9 @@ public class ImagePreViewItem extends VBox {
 
     public void setIsSelected(boolean isSelected) {
         this.isSelected.set(isSelected);
+    }
+
+    public File getImageFile() {
+        return imageFile;
     }
 }
