@@ -8,7 +8,6 @@ import viewer.service.ImageViewSerivce;
  * Created by PanD
  */
 
-
 public class ImageViewSerivceImpl implements ImageViewSerivce {
 
     @Override
@@ -17,6 +16,5 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
     }
-
 
 }

@@ -206,6 +206,17 @@ public class PictureOverviewController {
      * @return void
      */
     private void selectImageListener() {
+        //点击空白位置
+        previewPane.setOnMouseClicked(event -> {
+            if (event.getPickResult().getIntersectedNode() == previewPane){
+                PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
+                    image.setIsSelected(false);
+                });
+                PictureOverviewController.this.getSelectedImagePreViewSet().clear();
+            }
+        });
+
+        //监听选中列表，改变左下角 statLabel 的值
         selectedImagePreViewSet.addListener(new ChangeListener<ObservableSet<ImagePreViewItem>>() {
             @Override
             public void changed(ObservableValue<? extends ObservableSet<ImagePreViewItem>> observable, ObservableSet<ImagePreViewItem> oldValue, ObservableSet<ImagePreViewItem> newValue) {
@@ -215,7 +226,6 @@ public class PictureOverviewController {
                 } else {
                     stateLabel.setText(String.format("共 %d 张图片 | %d 张被选中 |",PictureOverviewController.this.imagePreViewSetProperty().size(), selected));
                 }
-
             }
         });
     }
