@@ -17,6 +17,8 @@ import javafx.scene.text.Font;
 import javafx.util.Callback;
 import viewer.model.DirTreeItem;
 import viewer.model.ImagePreViewItem;
+import viewer.service.ContextMenuService;
+import viewer.service.ServiceFactory;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -28,6 +30,8 @@ import java.util.List;
  */
 
 public class PictureOverviewController {
+
+    public ContextMenuService contextMenuService = ServiceFactory.getContextMenuService();
 
     @FXML
     private FlowPane previewPane;
@@ -226,18 +230,18 @@ public class PictureOverviewController {
      * @return void
      */
     private void selectImageListener() {
-        //点击空白位置
+
         previewPane.setOnMouseClicked(event -> {
+            //点击空白位置
             if (event.getPickResult().getIntersectedNode() == previewPane) {
+                //点击左键取消掉所有选中
                 if (event.getButton() == MouseButton.PRIMARY){
-                    //点击左键取消掉所有选中
-                    if (event.getButton() == MouseButton.PRIMARY) {
-                        PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
-                            image.setIsSelected(false);
-                        });
-                        PictureOverviewController.this.getSelectedImagePreViewSet().clear();
-                    }
+                    PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
+                        image.setIsSelected(false);
+                    });
+                    PictureOverviewController.this.getSelectedImagePreViewSet().clear();
                 }
+                //点击右键打开对应的上下文菜单
                 if (event.getButton() == MouseButton.SECONDARY){
                     contextMenu.getItems().clear();
                     contextMenu.getItems().addAll(pasteMenuItem, selectAllMenuItem);
@@ -250,6 +254,7 @@ public class PictureOverviewController {
                     contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
                 }
             }
+
         });
 
         //监听选中列表，改变左下角 statLabel 的值
@@ -303,10 +308,21 @@ public class PictureOverviewController {
      * @param
      * @return void
      */
-    public void menuItemOfRename() {
-
+    public void menuItemOfRename(List<File> fileList) {
+        contextMenuService.rename(fileList);
     }
 
+    public void menuItemOfCopy(List<File> fileList) {
+        contextMenuService.copy(fileList);
+    }
+
+    public void menuItemOfPaste(String path) {
+        contextMenuService.paste(stateLabel.getText());
+    }
+
+    public void menuItemOfCut(List<File> fileList) {
+        contextMenuService.cut(fileList);
+    }
 //工具方法
     /**
      * description: 将propertySet转为List，提取其中的File

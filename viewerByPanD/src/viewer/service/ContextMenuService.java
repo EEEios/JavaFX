@@ -14,7 +14,7 @@ public interface ContextMenuService {
 
     void copy(List<File> fileList);
 
-    void paste(List<File> fileList);
+    void paste(String path);
 
     void cut(List<File> fileList);
 }

@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import viewer.service.ServiceFactory;
 
 import java.io.IOException;
 
@@ -22,8 +23,14 @@ public class Main extends Application {
         this.primaryStage.getIcons().add(new Image("file:resources/images/title.png"));
         initRootLayout();
         showPictureOverview();
+
     }
 
+    /**
+     * description: 初始化外层骨架
+     * @param
+     * @return void
+     */
     public void initRootLayout(){
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -40,6 +47,11 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * description: 装载内部细节
+     * @param
+     * @return void
+     */
     public void showPictureOverview() {
         try {
             FXMLLoader loader = new FXMLLoader();

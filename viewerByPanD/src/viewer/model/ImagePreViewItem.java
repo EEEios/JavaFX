@@ -102,7 +102,8 @@ public class ImagePreViewItem extends VBox {
 
         //选中
         this.setOnMouseClicked(event -> {
-            //左键对应操作
+
+            //左键
             if (event.getClickCount() == 1 && (event.getButton() == MouseButton.PRIMARY)) {
                 //没有ctrl进行多选
                 if (event.isControlDown() == false) {
@@ -116,11 +117,6 @@ public class ImagePreViewItem extends VBox {
                     setIsSelected(false);
                     ImagePreViewItem.this.pictureOverviewController.selectedImagePreViewSetProperty().remove(ImagePreViewItem.this);
                 }
-            }
-
-            //TODO 双击打开图片
-            if (event.getClickCount() >= 2 && event.getButton() == MouseButton.PRIMARY) {
-                System.out.println("点了两次了");
             }
 
             //右键
