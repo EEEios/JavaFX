@@ -12,8 +12,8 @@
          <top>
             <ToolBar BorderPane.alignment="CENTER">
               <items>
-                <Button mnemonicParsing="false" text="Button" />
-                  <Button mnemonicParsing="false" text="Button" />
+                <Button mnemonicParsing="false" text="放大" />
+                  <Button mnemonicParsing="false" text="删除" />
                   <Button alignment="TOP_LEFT" mnemonicParsing="false" text="Button" />
               </items>
                <padding>
@@ -25,14 +25,14 @@
             <StackPane fx:id="imagePane" BorderPane.alignment="CENTER">
                <children>
                   <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
-                  <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButton" text="Button" StackPane.alignment="CENTER_LEFT">
+                  <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButton" text="前一张" StackPane.alignment="CENTER_LEFT">
                      <StackPane.margin>
-                        <Insets />
+                        <Insets left="50.0" />
                      </StackPane.margin>
                   </Button>
-                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButton" text="Button" StackPane.alignment="CENTER_RIGHT">
+                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButton" text="后一张" StackPane.alignment="CENTER_RIGHT">
                      <StackPane.margin>
-                        <Insets />
+                        <Insets right="50.0" />
                      </StackPane.margin>
                   </Button>
                </children>

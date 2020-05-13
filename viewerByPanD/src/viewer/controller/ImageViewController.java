@@ -1,16 +1,11 @@
 package viewer.controller;
 
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import viewer.constants.ImagePreviewConstant;
@@ -47,6 +42,7 @@ public class ImageViewController {
 
     //第一个要显示的图片，构造方法使用
     private File firstFile;
+
     //当前的选中的图片列表
     private List<File> imageFileList;
     private List<Image> images;
@@ -58,6 +54,7 @@ public class ImageViewController {
     private int currentIndex;
 
 // 初始化 -----------------------------------------------------------------------
+
     @FXML
     public void initialize() {
         //图片列表的初始化和装载
@@ -78,42 +75,106 @@ public class ImageViewController {
         //组件动态变换设置
         //imageView保持比例
         imageView.setPreserveRatio(true);
+        adjustImageView();
+
+        //根据Stage比例调整imageView
+        stageListener();
+
+        //未悬浮时隐藏按钮
+        nextButton.setOpacity(0);
+        previousButton.setOpacity(0);
+        pageButtonListener();
+    }
+
+//监听--------------------------------------------------------------------------
+
+    //Stage属性相关
+    public void stageListener() {
         parentStage.widthProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (newValue.doubleValue() < parentStage.heightProperty().doubleValue()) {
-                    imageView.setFitWidth(newValue.doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
-                }
+                adjustImageView();
             }
         });
         parentStage.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (newValue.doubleValue() < parentStage.widthProperty().doubleValue()) {
-                    imageView.setFitHeight(newValue.doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
-                }
+                adjustImageView();
             }
         });
     }
 
+    //翻页按钮相关
+    public void pageButtonListener() {
+
+        //下一页 ---------------------------------------------------------------
+        pageButtonReaction(nextButton);
+
+        //前一页 ---------------------------------------------------------------
+        pageButtonReaction(previousButton);
+    }
+
 //Action -----------------------------------------------------------------------
+
     //下一张
     public void nextButton() {
-        if ((++currentIndex) == images.size()) {
-            currentIndex = 0;
-        }
-        imageView.setImage(images.get(currentIndex));
+        nextPage();
     }
 
     //前一张
     public void previousButton() {
+        previousPage();
+    }
+
+//内部方法 ------------------------------------------------------------------------
+
+    //下一页
+    private void nextPage() {
+        if ((++currentIndex) == images.size()) {
+            currentIndex = 0;
+        }
+        imageView.setImage(images.get(currentIndex));
+
+        adjustImageView();
+    }
+
+    //上一页
+    private void previousPage() {
         if ((--currentIndex) == -1) {
             currentIndex = images.size() - 1;
         }
         imageView.setImage(images.get(currentIndex));
+
+        adjustImageView();
     }
+
+    //翻页按钮的操作，用同一模块，抽离成方法
+    private void pageButtonReaction(Button pageButton) {
+        //悬浮显示
+        pageButton.setOnMouseEntered(event -> {
+            pageButton.setOpacity(1);
+        });
+
+        //离开隐藏
+        pageButton.setOnMouseExited(event -> {
+            pageButton.setOpacity(0);
+        });
+    }
+
+    //根据窗口大小调整ImageView
+    private void adjustImageView() {
+        if (parentStage.widthProperty().doubleValue() < parentStage.heightProperty().doubleValue()) {
+            imageView.setFitWidth(parentStage.widthProperty().doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+        }
+        if (parentStage.heightProperty().doubleValue() < parentStage.widthProperty().doubleValue()) {
+            imageView.setFitHeight(parentStage.heightProperty().doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+        }
+    }
+
+
 //构造器 ------------------------------------------------------------------------
 
+    //传入需要展示的图片队列，首张图片，展示窗口
     public ImageViewController(List<File> imageFileList, File firstFile,Stage stage) {
         this.imageFileList = imageFileList;
         this.firstFile = firstFile;

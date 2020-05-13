@@ -6,6 +6,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import viewer.Main;
+import viewer.constants.ImageVIewStageConstant;
 import viewer.controller.ImageViewController;
 import viewer.service.ImageViewSerivce;
 
@@ -24,8 +25,10 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         Stage imagerViewStage = new Stage();
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
-        imagerViewStage.setMinWidth(800);
-        imagerViewStage.setMinHeight(600);
+        imagerViewStage.setMinWidth(ImageVIewStageConstant.STAGE_MIN_WIDTH);
+        imagerViewStage.setMinHeight(ImageVIewStageConstant.STAGE_MIN_HEIGHT);
+        imagerViewStage.setWidth(ImageVIewStageConstant.STAGE_PRE_WIDTH);
+        imagerViewStage.setHeight(ImageVIewStageConstant.STAGE_PRE_HEIGHT);
 
         //加载控制器
         ImageViewController imageViewController = new ImageViewController(imageList, firstFile, imagerViewStage);
