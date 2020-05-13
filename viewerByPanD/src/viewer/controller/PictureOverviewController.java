@@ -20,6 +20,7 @@ import viewer.model.ImagePreViewItem;
 import viewer.service.ContextMenuService;
 import viewer.service.ImageViewSerivce;
 import viewer.service.ServiceFactory;
+import viewer.utils.ConvertUtil;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
@@ -57,6 +58,8 @@ public class PictureOverviewController {
     private MenuItem renameMenuItem;
     @FXML
     private MenuItem selectAllMenuItem;
+    @FXML
+    private MenuItem openMenuItem;
 
     //页面下方说明选中的Label
     @FXML
@@ -234,8 +237,9 @@ public class PictureOverviewController {
     private void selectImageListener() {
 
         previewPane.setOnMouseClicked(event -> {
-            //点击空白位置
+
             if (event.getPickResult().getIntersectedNode() == previewPane) {
+                //点击空白位置
                 //点击左键取消掉所有选中
                 if (event.getButton() == MouseButton.PRIMARY){
                     PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
@@ -252,7 +256,7 @@ public class PictureOverviewController {
             } else {
                 if (event.getButton() == MouseButton.SECONDARY){
                     contextMenu.getItems().clear();
-                    contextMenu.getItems().addAll(copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, selectAllMenuItem);
+                    contextMenu.getItems().addAll(openMenuItem, copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, selectAllMenuItem);
                     contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
                 }
             }
@@ -305,6 +309,16 @@ public class PictureOverviewController {
     }
 
     /**
+     * description: 打开选中的文件
+     * @param
+     * @return
+     */
+    public void menuItemOfOpen() {
+        List<File> selectedFiles = ConvertUtil.simpleSetPropertyToList(selectedImagePreViewSetProperty());
+        imageViewSerivce.openImageViewStage(selectedFiles, selectedFiles.get(0));
+    }
+
+    /**
      * description: 重命名文件
      * @param
      * @return void
@@ -329,6 +343,7 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfPaste(String path) {
+
         contextMenuService.paste(stateLabel.getText());
     }
 

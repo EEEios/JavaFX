@@ -1,7 +1,5 @@
 package viewer.service.impl;
 
-import javafx.beans.property.SimpleSetProperty;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -9,7 +7,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import viewer.Main;
 import viewer.controller.ImageViewController;
-import viewer.model.ImagePreViewItem;
 import viewer.service.ImageViewSerivce;
 
 import java.io.File;
@@ -27,9 +24,11 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         Stage imagerViewStage = new Stage();
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
+        imagerViewStage.setMinWidth(800);
+        imagerViewStage.setMinHeight(600);
 
         //加载控制器
-        ImageViewController imageViewController = new ImageViewController(imageList, firstFile);
+        ImageViewController imageViewController = new ImageViewController(imageList, firstFile, imagerViewStage);
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/ImageView.fxml"));

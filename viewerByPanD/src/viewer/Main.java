@@ -23,7 +23,6 @@ public class Main extends Application {
         this.primaryStage.getIcons().add(new Image("file:resources/images/title.png"));
         initRootLayout();
         showPictureOverview();
-
     }
 
     /**

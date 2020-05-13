@@ -86,6 +86,7 @@
                                     <MenuItem fx:id="renameMenuItem" mnemonicParsing="false" text="重命名" />
                                     <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="粘贴" />
                                     <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" onAction="#menuItemOfSelectAll" text="全选" />
+                                    <MenuItem fx:id="openMenuItem" mnemonicParsing="false" onAction="#menuItemOfOpen" text="打开" />
                                 </items>
                               </ContextMenu>
                            </contextMenu>
