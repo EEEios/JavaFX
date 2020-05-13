@@ -1,13 +1,13 @@
 package viewer.controller;
 
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,7 +24,6 @@ import viewer.utils.ConvertUtil;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,7 +34,6 @@ public class PictureOverviewController {
 
     public ContextMenuService contextMenuService = ServiceFactory.getContextMenuService();
     public ImageViewSerivce imageViewSerivce = ServiceFactory.getImageViewSerivce();
-
 
     @FXML
     private FlowPane previewPane;
@@ -78,15 +76,15 @@ public class PictureOverviewController {
     private SimpleObjectProperty<File> selectedDir;
 
     //当前目录载入的缩略图
-    private SimpleSetProperty<ImagePreViewItem> imagePreViewSet;
-    private SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSet;
+    private SimpleListProperty<ImagePreViewItem> imagePreviewList;
+    private SimpleListProperty<ImagePreViewItem> selectedImagePreviewList;
 
 //初始化-----------------------------------------------------------------------------------
     @FXML
     public void initialize() {
 
-        this.imagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
-        this.selectedImagePreViewSet = new SimpleSetProperty<>(FXCollections.observableSet());
+        this.imagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
+        this.selectedImagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
         this.selectedDir = new SimpleObjectProperty<File>();
 
         initDirTree();
@@ -181,10 +179,10 @@ public class PictureOverviewController {
      * @return void
      */
     private void loadPicture(File[] images) {
-        imagePreViewSet.clear();
+        imagePreviewList.clear();
         for (File image : images) {
             ImagePreViewItem ipItem = new ImagePreViewItem(image, this);
-            imagePreViewSet.add(ipItem);
+            imagePreviewList.add(ipItem);
 
             //在页面载入缩略图
             this.getPreviewPane().getChildren().add(ipItem);
@@ -242,10 +240,10 @@ public class PictureOverviewController {
                 //点击空白位置
                 //点击左键取消掉所有选中
                 if (event.getButton() == MouseButton.PRIMARY){
-                    PictureOverviewController.this.getImagePreViewSet().forEach(image -> {
+                    PictureOverviewController.this.getImagePreviewList().forEach(image -> {
                         image.setIsSelected(false);
                     });
-                    PictureOverviewController.this.getSelectedImagePreViewSet().clear();
+                    PictureOverviewController.this.getSelectedImagePreviewList().clear();
                 }
                 //点击右键打开对应的上下文菜单
                 if (event.getButton() == MouseButton.SECONDARY){
@@ -264,14 +262,14 @@ public class PictureOverviewController {
         });
 
         //监听选中列表，改变左下角 statLabel 的值
-        selectedImagePreViewSet.addListener(new ChangeListener<ObservableSet<ImagePreViewItem>>() {
+        selectedImagePreviewList.addListener(new ChangeListener<ObservableList<ImagePreViewItem>>() {
             @Override
-            public void changed(ObservableValue<? extends ObservableSet<ImagePreViewItem>> observable, ObservableSet<ImagePreViewItem> oldValue, ObservableSet<ImagePreViewItem> newValue) {
-                int selected = PictureOverviewController.this.selectedImagePreViewSetProperty().size();
+            public void changed(ObservableValue<? extends ObservableList<ImagePreViewItem>> observable, ObservableList<ImagePreViewItem> oldValue, ObservableList<ImagePreViewItem> newValue) {
+                int selected = PictureOverviewController.this.selectedImagePreviewListProperty().size();
                 if (selected == 0){
-                    stateLabel.setText(String.format("共 %d 张图片 |",PictureOverviewController.this.imagePreViewSetProperty().size()));
+                    stateLabel.setText(String.format("共 %d 张图片 |",PictureOverviewController.this.imagePreviewListProperty().size()));
                 } else {
-                    stateLabel.setText(String.format("共 %d 张图片 | %d 张被选中 |",PictureOverviewController.this.imagePreViewSetProperty().size(), selected));
+                    stateLabel.setText(String.format("共 %d 张图片 | %d 张被选中 |",PictureOverviewController.this.imagePreviewListProperty().size(), selected));
                 }
             }
         });
@@ -301,10 +299,10 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfSelectAll() {
-        selectedImagePreViewSet.clear();
-        imagePreViewSet.forEach(imagePreViewItem -> {
+        selectedImagePreviewList.clear();
+        imagePreviewList.forEach(imagePreViewItem -> {
             imagePreViewItem.setIsSelected(true);
-            selectedImagePreViewSet.add(imagePreViewItem);
+            selectedImagePreviewList.add(imagePreViewItem);
         });
     }
 
@@ -314,7 +312,7 @@ public class PictureOverviewController {
      * @return
      */
     public void menuItemOfOpen() {
-        List<File> selectedFiles = ConvertUtil.simpleSetPropertyToList(selectedImagePreViewSetProperty());
+        List<File> selectedFiles = ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewListProperty());
         imageViewSerivce.openImageViewStage(selectedFiles, selectedFiles.get(0));
     }
 
@@ -365,19 +363,27 @@ public class PictureOverviewController {
         return previewPane;
     }
 
-    public ObservableSet<ImagePreViewItem> getImagePreViewSet() {
-        return imagePreViewSet.get();
+    public ObservableList<ImagePreViewItem> getImagePreviewList() {
+        return imagePreviewList.get();
     }
 
-    public SimpleSetProperty<ImagePreViewItem> imagePreViewSetProperty() {
-        return imagePreViewSet;
+    public SimpleListProperty<ImagePreViewItem> imagePreviewListProperty() {
+        return imagePreviewList;
     }
 
-    public ObservableSet<ImagePreViewItem> getSelectedImagePreViewSet() {
-        return selectedImagePreViewSet.get();
+    public void setImagePreviewList(ObservableList<ImagePreViewItem> imagePreviewList) {
+        this.imagePreviewList.set(imagePreviewList);
     }
 
-    public SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSetProperty() {
-        return selectedImagePreViewSet;
+    public ObservableList<ImagePreViewItem> getSelectedImagePreviewList() {
+        return selectedImagePreviewList.get();
+    }
+
+    public SimpleListProperty<ImagePreViewItem> selectedImagePreviewListProperty() {
+        return selectedImagePreviewList;
+    }
+
+    public void setSelectedImagePreviewList(ObservableList<ImagePreViewItem> selectedImagePreviewList) {
+        this.selectedImagePreviewList.set(selectedImagePreviewList);
     }
 }

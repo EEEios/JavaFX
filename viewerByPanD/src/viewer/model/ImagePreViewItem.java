@@ -12,7 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import viewer.constants.ImagePreviewConstant;
-import viewer.controller.ImageViewController;
 import viewer.controller.PictureOverviewController;
 import viewer.utils.ConvertUtil;
 
@@ -114,17 +113,17 @@ public class ImagePreViewItem extends VBox {
                 //单击，会取消掉其他的选择状态
                 if (isIsSelected() == false) {
                     setIsSelected(true);
-                    parentController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
+                    parentController.selectedImagePreviewListProperty().add(ImagePreViewItem.this);
                 } else {
                     setIsSelected(false);
-                    parentController.selectedImagePreViewSetProperty().remove(ImagePreViewItem.this);
+                    parentController.selectedImagePreviewListProperty().remove(ImagePreViewItem.this);
                 }
             }
 
             //双击左键(打开当前目录全部图片
             if (event.getClickCount() == 2 && (event.getButton() == MouseButton.PRIMARY)) {
                 parentController.imageViewSerivce.openImageViewStage(
-                        ConvertUtil.simpleSetPropertyToList(parentController.imagePreViewSetProperty()),
+                        ConvertUtil.simpleArrayListPropertyToList(parentController.imagePreviewListProperty()),
                                 ImagePreViewItem.this.imageFile
                 );
             }
@@ -132,10 +131,10 @@ public class ImagePreViewItem extends VBox {
             //右键
             if (event.getClickCount() == 1 && event.getButton() == MouseButton.SECONDARY) {
                 //右键点击的地方不是选中的文件则相当于 鼠标左键单击后右键打开菜单
-                if (parentController.selectedImagePreViewSetProperty().contains(event.getSource()) == false){
+                if (parentController.selectedImagePreviewListProperty().contains(event.getSource()) == false){
                     clearAllSelected();
                     setIsSelected(true);
-                    parentController.selectedImagePreViewSetProperty().add(ImagePreViewItem.this);
+                    parentController.selectedImagePreviewListProperty().add(ImagePreViewItem.this);
                 }
             }
         });
@@ -168,10 +167,10 @@ public class ImagePreViewItem extends VBox {
     private void clearAllSelected() {
         //清空选择
         ImagePreViewItem.this.pictureOverviewController
-                .selectedImagePreViewSetProperty().clear();
+                .selectedImagePreviewListProperty().clear();
         //将所有图片设置为 未选中
         ImagePreViewItem.this.pictureOverviewController
-                .getImagePreViewSet().forEach(loadedImage -> {
+                .getImagePreviewList().forEach(loadedImage -> {
             loadedImage.setIsSelected(false);
         });
     }
