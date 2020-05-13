@@ -124,7 +124,9 @@ public class ImagePreViewItem extends VBox {
             //双击左键(打开当前目录全部图片
             if (event.getClickCount() == 2 && (event.getButton() == MouseButton.PRIMARY)) {
                 parentController.imageViewSerivce.openImageViewStage(
-                        ConvertUtil.simpleSetPropertyToList(parentController.imagePreViewSetProperty())
+                        ConvertUtil.simpleSetPropertyToList(
+                                parentController.imagePreViewSetProperty()),
+                                ImagePreViewItem.this.imageFile
                 );
             }
 

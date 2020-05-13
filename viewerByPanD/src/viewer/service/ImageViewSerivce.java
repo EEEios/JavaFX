@@ -16,6 +16,5 @@ import java.util.List;
 public interface ImageViewSerivce {
 
     //打开查看图片页面
-    void openImageViewStage(List<File> imageList);
-
+    void openImageViewStage(List<File> imageList, File firstFile);
 }

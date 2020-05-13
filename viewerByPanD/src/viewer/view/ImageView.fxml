@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.image.*?>
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="691.0" prefWidth="886.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="691.0" prefWidth="886.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox prefHeight="691.0" prefWidth="886.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -25,16 +24,16 @@
             </ToolBar>
             <StackPane prefHeight="781.0" prefWidth="886.0">
                <children>
-                  <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                  <AnchorPane fx:id="imagePane" prefHeight="200.0" prefWidth="200.0">
                      <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <ImageView fx:id="imageView" fitHeight="648.0" fitWidth="886.0" layoutX="343.0" layoutY="262.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                      </children></AnchorPane>
-                  <Button mnemonicParsing="false" text="Button" StackPane.alignment="CENTER_RIGHT">
+                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButton" text="Button" StackPane.alignment="CENTER_RIGHT">
                      <StackPane.margin>
                         <Insets right="20.0" />
                      </StackPane.margin>
                   </Button>
-                  <Button mnemonicParsing="false" text="Button" StackPane.alignment="CENTER_LEFT">
+                  <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButton" text="Button" StackPane.alignment="CENTER_LEFT">
                      <StackPane.margin>
                         <Insets left="20.0" />
                      </StackPane.margin>

@@ -273,7 +273,6 @@ public class PictureOverviewController {
         });
     }
 
-
 //按钮/菜单Action (为 public 以便 fxml 能够读取) ------------------------------------------------------
     /**
      * description: 按钮：返回上级目录
@@ -342,11 +341,6 @@ public class PictureOverviewController {
         contextMenuService.cut(fileList);
     }
 
-//工具方法 --------------------------------------------------------------------------------------
-
-
-
-
 //getter & setter ------------------------------------------------------------------------
     public void setSelectedDir(File selectedDir) {
         this.selectedDir.set(selectedDir);
@@ -371,6 +365,4 @@ public class PictureOverviewController {
     public SimpleSetProperty<ImagePreViewItem> selectedImagePreViewSetProperty() {
         return selectedImagePreViewSet;
     }
-
-
 }

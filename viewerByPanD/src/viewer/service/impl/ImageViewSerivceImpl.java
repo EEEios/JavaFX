@@ -23,13 +23,13 @@ import java.util.List;
 public class ImageViewSerivceImpl implements ImageViewSerivce {
 
     @Override
-    public void openImageViewStage(List<File> imageList) {
+    public void openImageViewStage(List<File> imageList, File firstFile) {
         Stage imagerViewStage = new Stage();
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
 
         //加载控制器
-        ImageViewController imageViewController = new ImageViewController(imageList);
+        ImageViewController imageViewController = new ImageViewController(imageList, firstFile);
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/ImageView.fxml"));
@@ -44,5 +44,4 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
 
         imagerViewStage.show();
     }
-
 }
