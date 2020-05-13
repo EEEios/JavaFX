@@ -13,6 +13,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import viewer.constants.ImagePreviewConstant;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class ImageViewController {
         imageMap = new HashMap<>();
 
         imageFileList.forEach(file -> {
-            Image image = new Image("file:" + file.getPath(),600,600,true,true);
+            Image image = new Image("file:" + file.getPath(),0,0,true,true);
             images.add(image);
             imageMap.put(image,file);
             if (file.equals(firstFile)) {
@@ -75,26 +76,28 @@ public class ImageViewController {
         imageView.setImage(images.get(currentIndex));
 
         //组件动态变换设置
+        //imageView保持比例
         imageView.setPreserveRatio(true);
-        imageView.fitWidthProperty().bind(parentStage.widthProperty());
-//        imagePane.heightProperty().addListener(new ChangeListener<Number>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                System.out.println(newValue);
-//                imageView.setFitHeight(newValue.doubleValue());
-//            }
-//        });
-
-//        parentStage.widthProperty().addListener(new ChangeListener<Number>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                imageView.setFitWidth(newValue);
-//            }
-//        });
+        parentStage.widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (newValue.doubleValue() < parentStage.heightProperty().doubleValue()) {
+                    imageView.setFitWidth(newValue.doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+                }
+            }
+        });
+        parentStage.heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (newValue.doubleValue() < parentStage.widthProperty().doubleValue()) {
+                    imageView.setFitHeight(newValue.doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+                }
+            }
+        });
     }
 
-
 //Action -----------------------------------------------------------------------
+    //下一张
     public void nextButton() {
         if ((++currentIndex) == images.size()) {
             currentIndex = 0;
@@ -102,6 +105,7 @@ public class ImageViewController {
         imageView.setImage(images.get(currentIndex));
     }
 
+    //前一张
     public void previousButton() {
         if ((--currentIndex) == -1) {
             currentIndex = images.size() - 1;
