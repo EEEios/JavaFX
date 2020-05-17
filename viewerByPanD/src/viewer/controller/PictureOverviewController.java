@@ -2,11 +2,11 @@ package viewer.controller;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -17,7 +17,7 @@ import javafx.scene.text.Font;
 import javafx.util.Callback;
 import viewer.model.DirTreeItem;
 import viewer.model.ImagePreViewItem;
-import viewer.service.ContextMenuService;
+import viewer.service.FileOperationService;
 import viewer.service.ImageViewSerivce;
 import viewer.service.ServiceFactory;
 import viewer.utils.ConvertUtil;
@@ -32,7 +32,7 @@ import java.util.List;
 
 public class PictureOverviewController {
 
-    public ContextMenuService contextMenuService = ServiceFactory.getContextMenuService();
+    public FileOperationService fileOperationService = ServiceFactory.getFileOperationService();
     public ImageViewSerivce imageViewSerivce = ServiceFactory.getImageViewSerivce();
 
     @FXML
@@ -77,6 +77,7 @@ public class PictureOverviewController {
 
     //当前目录载入的缩略图
     private SimpleListProperty<ImagePreViewItem> imagePreviewList;
+    //当前已经选择的图片
     private SimpleListProperty<ImagePreViewItem> selectedImagePreviewList;
 
 //初始化-----------------------------------------------------------------------------------
@@ -322,7 +323,7 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfRename(List<File> fileList) {
-        contextMenuService.rename(fileList);
+        fileOperationService.rename(fileList);
 
     }
 
@@ -332,7 +333,7 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfCopy(List<File> fileList) {
-        contextMenuService.copy(fileList);
+        fileOperationService.copy(fileList);
     }
 
     /**
@@ -342,7 +343,7 @@ public class PictureOverviewController {
      */
     public void menuItemOfPaste(String path) {
 
-        contextMenuService.paste(stateLabel.getText());
+        fileOperationService.paste(stateLabel.getText());
     }
 
     /**
@@ -351,7 +352,7 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfCut(List<File> fileList) {
-        contextMenuService.cut(fileList);
+        fileOperationService.cut(fileList);
     }
 
 //getter & setter ------------------------------------------------------------------------

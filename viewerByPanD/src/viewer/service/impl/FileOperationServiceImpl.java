@@ -2,7 +2,7 @@ package viewer.service.impl;
 
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import viewer.service.ContextMenuService;
+import viewer.service.FileOperationService;
 
 import java.io.File;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.List;
  * Created by PanD
  */
 
-public class ContextMenuServiceImpl implements ContextMenuService {
+public class FileOperationServiceImpl implements FileOperationService {
 
     @Override
     public void rename(List<File> fileList) {

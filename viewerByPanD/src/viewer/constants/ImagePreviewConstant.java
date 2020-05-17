@@ -13,5 +13,5 @@ public interface ImagePreviewConstant {
     double VBOX_WIDTH = 140;
 
     //图片保持的比例（对窗口即Stage）
-    double IMAGE_PROPORTION_IN_STAGE = 0.6;
+    double IMAGE_PROPORTION_IN_STAGE = 0.8;
 }

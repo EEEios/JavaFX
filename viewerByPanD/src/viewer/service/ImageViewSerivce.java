@@ -1,10 +1,5 @@
 package viewer.service;
 
-import javafx.beans.property.SimpleSetProperty;
-import javafx.collections.ObservableSet;
-import javafx.stage.Stage;
-import viewer.model.ImagePreViewItem;
-
 import java.io.File;
 import java.util.List;
 

@@ -8,7 +8,7 @@ import java.util.List;
  * 2020/5/12 15:10
  */
 
-public interface ContextMenuService {
+public interface FileOperationService {
 
     void rename(List<File> fileList);
 

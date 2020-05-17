@@ -1,6 +1,6 @@
 package viewer.service;
 
-import viewer.service.impl.ContextMenuServiceImpl;
+import viewer.service.impl.FileOperationServiceImpl;
 import viewer.service.impl.ImageViewSerivceImpl;
 
 /**
@@ -11,12 +11,12 @@ import viewer.service.impl.ImageViewSerivceImpl;
 
 public class ServiceFactory {
 
-    private static ContextMenuService contextMenuService = new ContextMenuServiceImpl();
+    private static FileOperationService fileOperationService = new FileOperationServiceImpl();
 
     private static ImageViewSerivce imageViewSerivce = new ImageViewSerivceImpl();
 
-    public static ContextMenuService getContextMenuService() {
-        return contextMenuService;
+    public static FileOperationService getFileOperationService() {
+        return fileOperationService;
     }
 
     public static ImageViewSerivce getImageViewSerivce() {
