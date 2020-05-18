@@ -2,13 +2,13 @@ package viewer.controller;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleSetProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -57,6 +57,8 @@ public class PictureOverviewController {
     @FXML
     private MenuItem selectAllMenuItem;
     @FXML
+    private MenuItem deleteMenuItem;
+    @FXML
     private MenuItem openMenuItem;
 
     //页面下方说明选中的Label
@@ -79,13 +81,15 @@ public class PictureOverviewController {
     private SimpleListProperty<ImagePreViewItem> imagePreviewList;
     //当前已经选择的图片
     private SimpleListProperty<ImagePreViewItem> selectedImagePreviewList;
-
+    //待剪切的图片
+    private SimpleListProperty<ImagePreViewItem> cutedImageList;
 //初始化-----------------------------------------------------------------------------------
     @FXML
     public void initialize() {
 
         this.imagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
         this.selectedImagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
+        this.cutedImageList = new SimpleListProperty<>(FXCollections.observableArrayList());
         this.selectedDir = new SimpleObjectProperty<File>();
 
         initDirTree();
@@ -155,6 +159,7 @@ public class PictureOverviewController {
                     return;
                 }
                 //observable.getValue().getValue()为选中的目录
+                //TODO 测试代码，待删除
                 System.out.println(observable.getValue().getValue());
                 setSelectedDir(observable.getValue().getValue());
             }
@@ -200,30 +205,7 @@ public class PictureOverviewController {
         selectedDir.addListener(new ChangeListener<File>() {
             @Override
             public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
-
-                File currentDir = observable.getValue();
-
-                //上方导航栏初变化
-                pathLabel.setText(currentDir.getPath());
-
-                //筛选对应的图片文件
-                File[] images = currentDir.listFiles(
-                        pathname -> {
-                            if (pathname.isFile()) {
-                                String name = pathname.getName().toLowerCase();
-                                if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
-                                        || name.endsWith(".png") || name.endsWith("bmp")) {
-                                    return true;
-                                }
-                            }
-                            return false;
-                        }
-                );
-                stateLabel.setText(String.format("共 %d 张图片 |", images.length));
-                previewPane.getChildren().clear();
-
-                //加载图片
-                loadPicture(images);
+                refresh();
             }
         });
     }
@@ -241,21 +223,18 @@ public class PictureOverviewController {
                 //点击空白位置
                 //点击左键取消掉所有选中
                 if (event.getButton() == MouseButton.PRIMARY){
-                    PictureOverviewController.this.getImagePreviewList().forEach(image -> {
-                        image.setIsSelected(false);
-                    });
-                    PictureOverviewController.this.getSelectedImagePreviewList().clear();
+                    clearSelected();
                 }
                 //点击右键打开对应的上下文菜单
                 if (event.getButton() == MouseButton.SECONDARY){
                     contextMenu.getItems().clear();
-                    contextMenu.getItems().addAll(pasteMenuItem, selectAllMenuItem);
+                    contextMenu.getItems().addAll(pasteMenuItem, deleteMenuItem, selectAllMenuItem);
                     contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
                 }
             } else {
                 if (event.getButton() == MouseButton.SECONDARY){
                     contextMenu.getItems().clear();
-                    contextMenu.getItems().addAll(openMenuItem, copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, selectAllMenuItem);
+                    contextMenu.getItems().addAll(openMenuItem, copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, deleteMenuItem, selectAllMenuItem);
                     contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
                 }
             }
@@ -271,6 +250,27 @@ public class PictureOverviewController {
                     stateLabel.setText(String.format("共 %d 张图片 |",PictureOverviewController.this.imagePreviewListProperty().size()));
                 } else {
                     stateLabel.setText(String.format("共 %d 张图片 | %d 张被选中 |",PictureOverviewController.this.imagePreviewListProperty().size(), selected));
+                }
+            }
+        });
+    }
+
+    private void cutedImageListListener() {
+        cutedImageList.addListener(new ChangeListener<ObservableList<ImagePreViewItem>>() {
+            @Override
+            public void changed(ObservableValue<? extends ObservableList<ImagePreViewItem>> observable, ObservableList<ImagePreViewItem> oldValue, ObservableList<ImagePreViewItem> newValue) {
+                if (oldValue != null) {
+                    oldValue.forEach(imagePreViewItem -> {
+                        imagePreViewItem.setEffect(null);
+                    });
+                }
+                //剪切需要变透明
+                if (newValue != null) {
+                    if (newValue.size() > 0) {
+                        newValue.forEach(imagePreViewItem -> {
+                            imagePreViewItem.setEffect(new ColorAdjust(0, 0, 0.5, 0));
+                        });
+                    }
                 }
             }
         });
@@ -323,8 +323,8 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfRename(List<File> fileList) {
+        cutedImageList.clear();
         fileOperationService.rename(fileList);
-
     }
 
     /**
@@ -332,8 +332,12 @@ public class PictureOverviewController {
      * @param
      * @return void
      */
-    public void menuItemOfCopy(List<File> fileList) {
-        fileOperationService.copy(fileList);
+    public void menuItemOfCopy() {
+        cutedImageList.clear();
+
+        fileOperationService.copy(ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewList));
+
+        clearSelected();
     }
 
     /**
@@ -341,9 +345,18 @@ public class PictureOverviewController {
      * @param
      * @return void
      */
-    public void menuItemOfPaste(String path) {
+    public void menuItemOfPaste() {
+        List<File> pasteFiles = fileOperationService.paste(selectedDir.getValue().getPath());
+        if (pasteFiles != null) {
+            pasteFiles.forEach(file -> {
+                ImagePreViewItem ipItem = new ImagePreViewItem(file, this);
+                imagePreviewList.add(ipItem);
+                //在页面载入缩略图
+                this.getPreviewPane().getChildren().add(ipItem);
+            });
+        }
 
-        fileOperationService.paste(stateLabel.getText());
+        clearSelected();
     }
 
     /**
@@ -352,7 +365,62 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfCut(List<File> fileList) {
+        //剪切当前被选中的图片
+        cutedImageList = selectedImagePreviewList;
         fileOperationService.cut(fileList);
+    }
+
+    /**
+     * description: 删除文件
+     * @param
+     * @return void
+     */
+    public void menuItemOfDelete() {
+        cutedImageList.clear();
+
+        if (fileOperationService.delete(ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewList))) {
+            //删除成功就移除
+            this.previewPane.getChildren().removeAll(selectedImagePreviewList);
+            selectedImagePreviewList.clear();
+        }
+
+        clearSelected();
+    }
+
+//私有方法 ---------------------------------------------------------------------------------
+    private void refresh() {
+        //上方导航栏初变化
+        pathLabel.setText(selectedDir.getValue().getPath());
+        //筛选对应的图片文件
+        File[] images = selectedDir.getValue().listFiles(
+                pathname -> {
+                    if (pathname.isFile()) {
+                        String name = pathname.getName().toLowerCase();
+                        if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
+                                || name.endsWith(".png") || name.endsWith("bmp")) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+        );
+        stateLabel.setText(String.format("共 %d 张图片 |", images.length));
+        previewPane.getChildren().clear();
+
+        //加载图片
+        loadPicture(images);
+    }
+
+    /**
+     * description: 清除选中的图片
+     * @param
+     * @return void
+     */
+    private void clearSelected() {
+        PictureOverviewController.this.getImagePreviewList().forEach(image -> {
+            image.setIsSelected(false);
+        });
+        PictureOverviewController.this.getSelectedImagePreviewList().clear();
     }
 
 //getter & setter ------------------------------------------------------------------------

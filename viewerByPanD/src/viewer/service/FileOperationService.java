@@ -1,5 +1,8 @@
 package viewer.service;
 
+import javafx.beans.property.SimpleListProperty;
+import viewer.model.ImagePreViewItem;
+
 import java.io.File;
 import java.util.List;
 
@@ -13,7 +16,9 @@ public interface FileOperationService {
 
     void copy(List<File> fileList);
 
-    void paste(String path);
+    List<File> paste(String path);
 
     void cut(List<File> fileList);
+
+    boolean delete(List<File> fileList);
 }

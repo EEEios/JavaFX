@@ -102,6 +102,7 @@ public class ImageViewController {
 
 //监听--------------------------------------------------------------------------
 
+    //不包含stageListener的初始化，stageListener初始化需要等待stage的传入装载，见@setParentStage(Stage parentStage, boolean isInitial)
     private void initialListener() {
         //根据Stage比例调整imageView
         isInitialStageListener();

@@ -81,12 +81,13 @@
                            <contextMenu>
                               <ContextMenu fx:id="contextMenu">
                                 <items>
-                                  <MenuItem fx:id="copyMenuItem" mnemonicParsing="false" text="复制" />
+                                  <MenuItem fx:id="copyMenuItem" mnemonicParsing="false" onAction="#menuItemOfCopy" text="复制" />
                                     <MenuItem fx:id="cutMenuItem" mnemonicParsing="false" text="剪切" />
                                     <MenuItem fx:id="renameMenuItem" mnemonicParsing="false" text="重命名" />
-                                    <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="粘贴" />
+                                    <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" onAction="#menuItemOfPaste" text="粘贴" />
                                     <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" onAction="#menuItemOfSelectAll" text="全选" />
                                     <MenuItem fx:id="openMenuItem" mnemonicParsing="false" onAction="#menuItemOfOpen" text="打开" />
+                                    <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" onAction="#menuItemOfDelete" text="删除" />
                                 </items>
                               </ContextMenu>
                            </contextMenu>
