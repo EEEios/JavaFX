@@ -7,7 +7,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import viewer.service.ServiceFactory;
 
 import java.io.IOException;
 

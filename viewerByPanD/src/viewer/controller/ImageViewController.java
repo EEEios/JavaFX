@@ -1,11 +1,15 @@
 package viewer.controller;
 
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import viewer.constants.ImagePreviewConstant;
@@ -27,6 +31,11 @@ import java.util.List;
 public class ImageViewController {
 
     @FXML
+    private ToolBar toolBar;
+    @FXML
+    private AnchorPane anchorPane;
+
+    @FXML
     private Button previousButton;
     @FXML
     private Button nextButton;
@@ -38,7 +47,9 @@ public class ImageViewController {
     @FXML
     private ImageView imageView;
 
+    //容器属性
     private Stage parentStage;
+    private SimpleBooleanProperty isInitialStage;
 
     //第一个要显示的图片，构造方法使用
     private File firstFile;
@@ -51,14 +62,21 @@ public class ImageViewController {
     private HashMap<Image, File> imageMap;
 
     //当前选中图片的索引
-    private int currentIndex;
-
+    private SimpleIntegerProperty currentIndex;
+    private Image currentImage;
 // 初始化 -----------------------------------------------------------------------
 
     @FXML
     public void initialize() {
+        //检测ToolBar高度用的代码
+//        Button button = new Button();
+//        button.setLayoutX(0);
+//        button.setLayoutY(257+43);
+//        anchorPane.getChildren().addAll(button);
+//        System.out.println("button: " + button.getPrefHeight());
         //图片列表的初始化和装载
-        currentIndex = 0;
+        isInitialStage = new SimpleBooleanProperty(false);
+        currentIndex = new SimpleIntegerProperty(0);
         images = new ArrayList<>();
         imageMap = new HashMap<>();
 
@@ -67,26 +85,43 @@ public class ImageViewController {
             images.add(image);
             imageMap.put(image,file);
             if (file.equals(firstFile)) {
-                currentIndex = images.indexOf(image);
+                currentIndex.setValue(images.indexOf(image));
+                currentImage = images.get(currentIndex.intValue());
             }
         });
-        imageView.setImage(images.get(currentIndex));
+        imageView.setImage(images.get(currentIndex.intValue()));
 
         //组件动态变换设置
-        //imageView保持比例
         imageView.setPreserveRatio(true);
-        adjustImageView();
 
-        //根据Stage比例调整imageView
-        stageListener();
+        //初始化监听
+        initialListener();
 
-        //未悬浮时隐藏按钮
-        nextButton.setOpacity(0);
-        previousButton.setOpacity(0);
-        pageButtonListener();
+//        adjustImageView();
     }
 
 //监听--------------------------------------------------------------------------
+
+    private void initialListener() {
+        //根据Stage比例调整imageView
+        isInitialStageListener();
+        //TODO 未悬浮时隐藏按钮
+//        pageButtonListener();
+        currentImageListener();
+    }
+
+    //根据isInitialScene是否被传入，初始化stageListener()
+    private void isInitialStageListener() {
+        isInitialStage.addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (newValue.booleanValue() == true) {
+                    adjustImageView();
+                    stageListener();
+                }
+            }
+        });
+    }
 
     //Stage属性相关
     public void stageListener() {
@@ -114,6 +149,15 @@ public class ImageViewController {
         pageButtonReaction(previousButton);
     }
 
+    //当前图片相关
+    public void currentImageListener() {
+        currentIndex.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                currentImage = images.get(newValue.intValue());
+            }
+        });
+    }
 //Action -----------------------------------------------------------------------
 
     //下一张
@@ -130,20 +174,24 @@ public class ImageViewController {
 
     //下一页
     private void nextPage() {
-        if ((++currentIndex) == images.size()) {
-            currentIndex = 0;
+        int index = currentIndex.getValue().intValue() + 1;
+        if (index == images.size()) {
+            index = 0;
         }
-        imageView.setImage(images.get(currentIndex));
+        currentIndex.setValue(index);
+        imageView.setImage(currentImage);
 
         adjustImageView();
     }
 
     //上一页
     private void previousPage() {
-        if ((--currentIndex) == -1) {
-            currentIndex = images.size() - 1;
+        int index = currentIndex.getValue().intValue() - 1;
+        if (index == -1) {
+            index = images.size() - 1;
         }
-        imageView.setImage(images.get(currentIndex));
+        currentIndex.setValue(index);
+        imageView.setImage(currentImage);
 
         adjustImageView();
     }
@@ -163,24 +211,39 @@ public class ImageViewController {
 
     //根据窗口大小调整ImageView
     private void adjustImageView() {
-        if (parentStage.widthProperty().doubleValue() < parentStage.heightProperty().doubleValue()) {
-            imageView.setFitWidth(parentStage.widthProperty().doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
-        }
-        if (parentStage.heightProperty().doubleValue() < parentStage.widthProperty().doubleValue()) {
-            imageView.setFitHeight(parentStage.heightProperty().doubleValue() * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+        //Toolbar 高度为43,使用下面的命令查询
+//            System.out.println("ToolBar: " + toolBar.prefHeight(-1));
+        double toolBarHeight = toolBar.prefHeight(-1);
+        double scenceHeight = parentStage.getScene().getHeight() - toolBarHeight;
+        double scenceWidth = parentStage.getScene().getWidth();
+
+        if (currentImage.getHeight() < scenceHeight
+                && currentImage.getWidth() < scenceWidth) {
+            imageView.setFitHeight(currentImage.getHeight());
+            imageView.setFitWidth(currentImage.getWidth());
+        } else {
+            if (scenceHeight > scenceWidth) {
+                imageView.setFitWidth(scenceWidth * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+            }
+            if (scenceHeight < scenceWidth) {
+                imageView.setFitHeight(scenceHeight * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
+                System.out.println(imageView.getFitHeight());
+            }
         }
     }
-
 
 //构造器 ------------------------------------------------------------------------
 
     //传入需要展示的图片队列，首张图片，展示窗口
-    public ImageViewController(List<File> imageFileList, File firstFile,Stage stage) {
+    public ImageViewController(List<File> imageFileList, File firstFile) {
         this.imageFileList = imageFileList;
         this.firstFile = firstFile;
-        this.parentStage = stage;
     }
 
 //getter & setter --------------------------------------------------------------
 
+    public void setParentStage(Stage parentStage, boolean isInitial) {
+        this.parentStage = parentStage;
+        this.isInitialStage.set(isInitial);
+    }
 }
