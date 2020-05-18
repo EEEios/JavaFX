@@ -1,51 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="viewer.view.PictureOverviewController">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="viewer.controller.PictureOverviewController">
    <children>
       <SplitPane dividerPositions="0.3193979933110368" layoutX="81.0" layoutY="56.0" prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <items>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <TreeView fx:id="fileTree" layoutX="-11.0" prefHeight="398.0" prefWidth="234.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <TreeView fx:id="dirTree" layoutX="-11.0" prefHeight="398.0" prefWidth="234.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children></AnchorPane>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
                   <BorderPane layoutX="47.0" layoutY="58.0" prefHeight="398.0" prefWidth="404.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <center>
-                        <FlowPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-                     </center>
-                     <top>
-                        <MenuBar BorderPane.alignment="CENTER">
-                          <menus>
-                            <Menu mnemonicParsing="false" text="File">
-                              <items>
-                                <MenuItem mnemonicParsing="false" text="Close" />
-                              </items>
-                            </Menu>
-                            <Menu mnemonicParsing="false" text="Edit">
-                              <items>
-                                <MenuItem mnemonicParsing="false" text="Delete" />
-                              </items>
-                            </Menu>
-                            <Menu mnemonicParsing="false" text="Help">
-                              <items>
-                                <MenuItem mnemonicParsing="false" text="About" />
-                              </items>
-                            </Menu>
-                          </menus>
-                        </MenuBar>
-                     </top>
                      <bottom>
                         <AnchorPane prefHeight="21.0" prefWidth="404.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label fx:id="stateLabel" disable="true" prefHeight="21.0" prefWidth="90.0" text="Label" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
-                              <Button fx:id="slidPlayButton" layoutX="314.0" layoutY="-1.0" mnemonicParsing="false" text="Button" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
+                              <Label fx:id="stateLabel" disable="true" prefHeight="21.0" prefWidth="150.0" text="Label" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
+                              <Button fx:id="slidPlayButton" layoutX="329.0" layoutY="8.0" mnemonicParsing="false" text="Button" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
                            </children>
                         </AnchorPane>
                      </bottom>
+                     <top>
+                        <HBox prefHeight="30.0" prefWidth="404.0" spacing="10.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Button fx:id="backToParentFileButton" mnemonicParsing="false" onAction="#backToParentDirectory" text="上级目录">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="10.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button mnemonicParsing="false" text="删除">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button mnemonicParsing="false" text="Button">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button mnemonicParsing="false" text="Button">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Label fx:id="pathLabel" prefHeight="23.0" prefWidth="300.0" text="Label" textFill="#4a4343">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="30.0" top="5.0" />
+                                 </HBox.margin>
+                                 <font>
+                                    <Font name="Microsoft YaHei" size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </HBox>
+                     </top>
+                     <center>
+                        <ScrollPane fx:id="scrollPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+                           <padding>
+                              <Insets bottom="15.0" />
+                           </padding>
+                           <content>
+                              <AnchorPane prefHeight="324.0" prefWidth="374.0">
+                                 <children>
+                                    <FlowPane fx:id="previewPane" hgap="15.0" prefHeight="324.0" prefWidth="394.0" vgap="15.0" AnchorPane.rightAnchor="-35.0">
+                                       <padding>
+                                          <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                                       </padding>
+                                    </FlowPane>
+                                 </children>
+                                 <padding>
+                                    <Insets right="20.0" />
+                                 </padding>
+                              </AnchorPane>
+                           </content>
+                           <contextMenu>
+                              <ContextMenu fx:id="contextMenu" onAction="#menuItemOfCut">
+                                <items>
+                                  <MenuItem fx:id="copyMenuItem" mnemonicParsing="false" onAction="#menuItemOfCopy" text="复制" />
+                                    <MenuItem fx:id="cutMenuItem" mnemonicParsing="false" text="剪切" />
+                                    <MenuItem fx:id="renameMenuItem" mnemonicParsing="false" text="重命名" />
+                                    <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" onAction="#menuItemOfPaste" text="粘贴" />
+                                    <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" onAction="#menuItemOfSelectAll" text="全选" />
+                                    <MenuItem fx:id="openMenuItem" mnemonicParsing="false" onAction="#menuItemOfOpen" text="打开" />
+                                    <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" onAction="#menuItemOfDelete" text="删除" />
+                                </items>
+                              </ContextMenu>
+                           </contextMenu>
+                        </ScrollPane>
+                     </center>
                   </BorderPane>
                </children></AnchorPane>
         </items>

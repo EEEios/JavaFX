@@ -18,12 +18,17 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         this.primaryStage = primaryStage;
-        primaryStage.setTitle("AddressApp");
+        primaryStage.setTitle("Picture Viewer");
         this.primaryStage.getIcons().add(new Image("file:resources/images/title.png"));
         initRootLayout();
         showPictureOverview();
     }
 
+    /**
+     * description: 初始化外层骨架
+     * @param
+     * @return void
+     */
     public void initRootLayout(){
         try {
             FXMLLoader loader = new FXMLLoader();
@@ -32,19 +37,25 @@ public class Main extends Application {
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
+            primaryStage.setMinHeight(637);
+            primaryStage.setMinWidth(1057);
             primaryStage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * description: 装载内部细节
+     * @param
+     * @return void
+     */
     public void showPictureOverview() {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/PictureOverview.fxml"));
             AnchorPane pictureOverview = (AnchorPane) loader.load();
 
-//            AnchorPane pictureOverview = FXMLLoader.load(Main.class.getResource("view/PictureOverview.fxml"));
             rootLayout.setCenter(pictureOverview);
         } catch (IOException e) {
             e.printStackTrace();

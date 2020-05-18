@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="691.0" prefWidth="886.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane prefHeight="691.0" prefWidth="886.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <top>
+            <ToolBar fx:id="toolBar" BorderPane.alignment="CENTER">
+              <items>
+                <Button mnemonicParsing="false" text="放大" />
+                  <Button mnemonicParsing="false" text="删除" />
+                  <Button alignment="TOP_LEFT" mnemonicParsing="false" text="Button" />
+              </items>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+               </padding>
+            </ToolBar>
+         </top>
+         <center>
+            <StackPane fx:id="imagePane" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fx:id="imageView" pickOnBounds="true" preserveRatio="true" StackPane.alignment="CENTER" />
+                  <Button fx:id="previousButton" mnemonicParsing="false" onAction="#previousButton" text="前一张" StackPane.alignment="CENTER_LEFT">
+                     <StackPane.margin>
+                        <Insets left="20.0" />
+                     </StackPane.margin>
+                  </Button>
+                  <Button fx:id="nextButton" mnemonicParsing="false" onAction="#nextButton" text="后一张" StackPane.alignment="CENTER_RIGHT">
+                     <StackPane.margin>
+                        <Insets right="20.0" />
+                     </StackPane.margin>
+                  </Button>
+               </children>
+            </StackPane>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>

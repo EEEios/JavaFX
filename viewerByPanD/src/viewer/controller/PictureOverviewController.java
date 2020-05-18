@@ -1,0 +1,470 @@
+package viewer.controller;
+
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.text.Font;
+import javafx.util.Callback;
+import viewer.model.DirTreeItem;
+import viewer.model.ImagePreViewItem;
+import viewer.service.FileOperationService;
+import viewer.service.ImageViewSerivce;
+import viewer.service.ServiceFactory;
+import viewer.utils.ConvertUtil;
+
+import javax.swing.filechooser.FileSystemView;
+import java.io.File;
+import java.util.List;
+
+/**
+ * Created by PanD
+ */
+
+public class PictureOverviewController {
+
+    public FileOperationService fileOperationService = ServiceFactory.getFileOperationService();
+    public ImageViewSerivce imageViewSerivce = ServiceFactory.getImageViewSerivce();
+
+    @FXML
+    private FlowPane previewPane;
+    @FXML
+    private ScrollPane scrollPane;
+    //目录树
+    @FXML
+    private TreeView<File> dirTree;
+    //上下文菜单
+    @FXML
+    private ContextMenu contextMenu;
+
+    @FXML
+    private MenuItem copyMenuItem;
+    @FXML
+    private MenuItem cutMenuItem;
+    @FXML
+    private MenuItem pasteMenuItem;
+    @FXML
+    private MenuItem renameMenuItem;
+    @FXML
+    private MenuItem selectAllMenuItem;
+    @FXML
+    private MenuItem deleteMenuItem;
+    @FXML
+    private MenuItem openMenuItem;
+
+    //页面下方说明选中的Label
+    @FXML
+    private Label stateLabel;
+    //路径导航栏的Label
+    @FXML
+    private Label pathLabel;
+    //幻灯片播放
+    @FXML
+    private Button slidPlayButton;
+    //返回上级目录
+    @FXML
+    private Button backToParentFileButton;
+
+    //被选中的目录
+    private SimpleObjectProperty<File> selectedDir;
+
+    //当前目录载入的缩略图
+    private SimpleListProperty<ImagePreViewItem> imagePreviewList;
+    //当前已经选择的图片
+    private SimpleListProperty<ImagePreViewItem> selectedImagePreviewList;
+    //待剪切的图片
+    private SimpleListProperty<ImagePreViewItem> cutedImageList;
+//初始化-----------------------------------------------------------------------------------
+    @FXML
+    public void initialize() {
+
+        this.imagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
+        this.selectedImagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
+        this.cutedImageList = new SimpleListProperty<>(FXCollections.observableArrayList());
+        this.selectedDir = new SimpleObjectProperty<File>();
+
+        initDirTree();
+        initPreview();
+    }
+
+    /**
+     * description: 目录树的初始化
+     * @param
+     * @return void
+     */
+    public void initDirTree() {
+        DirTreeItem root = new DirTreeItem(new File("root"), true);
+        root.load();
+        root.setExpanded(true);
+
+        dirTree.setRoot(root);
+        dirTree.setShowRoot(false);
+        dirTree.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
+        //加载根节点的子节点，例如C:、D:..
+        for (TreeItem<File> item :  root.getChildren()) {
+            ((DirTreeItem) item).load();
+        }
+        //设置初始TreeView单元样式----------------------------------------------------------------------
+        dirTree.setCellFactory(new Callback<TreeView<File>, TreeCell<File>>() {
+            @Override
+            public TreeCell<File> call(TreeView<File> param) {
+                return new TreeCell<File>() {
+                    @Override
+                    protected void updateItem(File item, boolean empty) {
+                        super.updateItem(item, empty);
+                        setFont(new Font("Microsoft YaHei", 14.0));
+                        if (!empty) {
+                            ImageView icon = null;
+                            if (!this.getTreeItem().isExpanded()) {
+                                if (((DirTreeItem) getTreeItem().getParent()).isRoot()) {
+                                    icon = new ImageView(new Image("file:resources/images/portable-power-solid.png", 16, 16, true, true)); // 磁盘
+                                } else {
+                                    icon = new ImageView(new Image("file:resources/images/folder-solid.png", 16, 16, true, true)); // 磁盘
+                                }
+                            } else {
+                                if (((DirTreeItem) getTreeItem().getParent()).isRoot()) {
+                                    icon = new ImageView(new Image("file:resources/images/portable-power-solid (1).png", 16, 16, true, true)); // 磁盘
+                                } else {
+                                    icon = new ImageView(new Image("file:resources/images/folder-open-solid.png", 16, 16, true, true)); // 磁盘
+                                }
+                            }
+                            setGraphic(icon);
+                            String name = FileSystemView.getFileSystemView().getSystemDisplayName(item);
+                            setText(name);
+                        } else {
+                            setText(null);
+                            setGraphic(null);
+                        }
+                    }
+                };
+            }
+        });
+
+        //选项选中事件----------------------------------------------------------------------
+        dirTree.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<File>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<File>> observable, TreeItem<File> oldValue,
+                                TreeItem<File> newValue) {
+                if (newValue == null) {
+                    return;
+                }
+                //observable.getValue().getValue()为选中的目录
+                //TODO 测试代码，待删除
+                System.out.println(observable.getValue().getValue());
+                setSelectedDir(observable.getValue().getValue());
+            }
+        });
+
+    }
+
+    /**
+     * description: 图片预览区域的初始化
+     * @param
+     * @return void
+     */
+    public void initPreview() {
+        previewPane.prefWidthProperty().bind(scrollPane.widthProperty());
+        pathLabel.setText("");
+        pathLabelListener();
+        selectImageListener();
+    }
+
+    /**
+     * description: 载入当前目录的图片的缩略图
+     * @param images
+     * @return void
+     */
+    private void loadPicture(File[] images) {
+        imagePreviewList.clear();
+        for (File image : images) {
+            ImagePreViewItem ipItem = new ImagePreViewItem(image, this);
+            imagePreviewList.add(ipItem);
+
+            //在页面载入缩略图
+            this.getPreviewPane().getChildren().add(ipItem);
+        }
+    }
+
+//监听 ------------------------------------------------------------------------------------
+    /**
+     * description: 对路径进行监听
+     * @param
+     * @return void
+     */
+    private void pathLabelListener() {
+        selectedDir.addListener(new ChangeListener<File>() {
+            @Override
+            public void changed(ObservableValue<? extends File> observable, File oldValue, File newValue) {
+                refresh();
+            }
+        });
+    }
+
+    /**
+     * description: 对预览图片区域鼠标事件的监听
+     * @param
+     * @return void
+     */
+    private void selectImageListener() {
+
+        previewPane.setOnMouseClicked(event -> {
+
+            if (event.getPickResult().getIntersectedNode() == previewPane) {
+                //点击空白位置
+                //点击左键取消掉所有选中
+                if (event.getButton() == MouseButton.PRIMARY){
+                    clearSelected();
+                }
+                //点击右键打开对应的上下文菜单
+                if (event.getButton() == MouseButton.SECONDARY){
+                    contextMenu.getItems().clear();
+                    contextMenu.getItems().addAll(pasteMenuItem, deleteMenuItem, selectAllMenuItem);
+                    contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
+                }
+            } else {
+                if (event.getButton() == MouseButton.SECONDARY){
+                    contextMenu.getItems().clear();
+                    contextMenu.getItems().addAll(openMenuItem, copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, deleteMenuItem, selectAllMenuItem);
+                    contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
+                }
+            }
+
+        });
+
+        //监听选中列表，改变左下角 statLabel 的值
+        selectedImagePreviewList.addListener(new ChangeListener<ObservableList<ImagePreViewItem>>() {
+            @Override
+            public void changed(ObservableValue<? extends ObservableList<ImagePreViewItem>> observable, ObservableList<ImagePreViewItem> oldValue, ObservableList<ImagePreViewItem> newValue) {
+                int selected = PictureOverviewController.this.selectedImagePreviewListProperty().size();
+                if (selected == 0){
+                    stateLabel.setText(String.format("共 %d 张图片 |",PictureOverviewController.this.imagePreviewListProperty().size()));
+                } else {
+                    stateLabel.setText(String.format("共 %d 张图片 | %d 张被选中 |",PictureOverviewController.this.imagePreviewListProperty().size(), selected));
+                }
+            }
+        });
+    }
+
+//按钮/菜单Action (为 public 以便 fxml 能够读取) ------------------------------------------------------
+    /**
+     * description: 按钮：返回上级目录
+     * @param
+     * @return void
+     */
+    public void backToParentDirectory() {
+        //没有选择目录时返回上级
+        if (selectedDir == null || selectedDir.getValue() == null) {
+            return;
+        }
+        //选择目录返回上级时
+        if (selectedDir.getValue().getParentFile() != null) {
+            setSelectedDir(selectedDir.getValue().getParentFile());
+//            System.out.println("parent file:" + selectedDir.getValue().getPath());
+        }
+    }
+
+    /**
+     * description: 右键菜单：全选
+     * @param
+     * @return void
+     */
+    public void menuItemOfSelectAll() {
+        selectedImagePreviewList.clear();
+        imagePreviewList.forEach(imagePreViewItem -> {
+            imagePreViewItem.setIsSelected(true);
+            selectedImagePreviewList.add(imagePreViewItem);
+        });
+    }
+
+    /**
+     * description: 打开选中的文件
+     * @param
+     * @return
+     */
+    public void menuItemOfOpen() {
+        clearCuted();
+
+        List<File> selectedFiles = ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewListProperty());
+        imageViewSerivce.openImageViewStage(selectedFiles, selectedFiles.get(0));
+    }
+
+    /**
+     * description: 重命名文件
+     * @param
+     * @return void
+     */
+    public void menuItemOfRename(List<File> fileList) {
+        clearCuted();
+
+        fileOperationService.rename(fileList);
+    }
+
+    /**
+     * description: 复制文件
+     * @param
+     * @return void
+     */
+    public void menuItemOfCopy() {
+        clearCuted();
+
+        fileOperationService.copy(ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewList));
+
+        clearSelected();
+    }
+
+    /**
+     * description: 粘贴文件
+     * @param
+     * @return void
+     */
+    public void menuItemOfPaste() {
+
+        List<File> pasteFiles = fileOperationService.paste(selectedDir.getValue().getPath());
+        if (pasteFiles != null) {
+            pasteFiles.forEach(file -> {
+                ImagePreViewItem ipItem = new ImagePreViewItem(file, this);
+                imagePreviewList.add(ipItem);
+                //在页面载入缩略图
+                this.getPreviewPane().getChildren().add(ipItem);
+            });
+        }
+        if (cutedImageList != null) {
+            cutedImageList.forEach(oldImage -> {
+                oldImage.getImageFile().delete();
+            });
+            clearCuted();
+        }
+
+        clearCuted();
+        clearSelected();
+    }
+
+    /**
+     * description: 剪切文件
+     * @param
+     * @return void
+     */
+    public void menuItemOfCut() {
+        //剪切当前被选中的图片
+        clearCuted();
+
+        selectedImagePreviewList.forEach(image -> {
+            cutedImageList.getValue().add(image);
+        });
+        cutedImageList.forEach(cutedImage -> {
+            cutedImage.setEffect(new ColorAdjust(0, 0, 0.5, 0));
+        });
+        fileOperationService.cut(ConvertUtil.simpleArrayListPropertyToList(cutedImageList));
+    }
+
+    /**
+     * description: 删除文件
+     * @param
+     * @return void
+     */
+    public void menuItemOfDelete() {
+        clearCuted();
+        if (fileOperationService.delete(ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewList))) {
+            //删除成功就移除
+            this.previewPane.getChildren().removeAll(selectedImagePreviewList);
+            selectedImagePreviewList.clear();
+        }
+
+        clearSelected();
+    }
+
+//私有方法 ---------------------------------------------------------------------------------
+    /**
+     * description: 刷新页面
+     * @param
+     * @return void
+     */
+    private void refresh() {
+        //上方导航栏初变化
+        pathLabel.setText(selectedDir.getValue().getPath());
+        //筛选对应的图片文件
+        File[] images = selectedDir.getValue().listFiles(
+                pathname -> {
+                    if (pathname.isFile()) {
+                        String name = pathname.getName().toLowerCase();
+                        if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
+                                || name.endsWith(".png") || name.endsWith("bmp")) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+        );
+        stateLabel.setText(String.format("共 %d 张图片 |", images.length));
+        previewPane.getChildren().clear();
+
+        //加载图片
+        loadPicture(images);
+    }
+
+    /**
+     * description: 清除选中的图片
+     * @param
+     * @return void
+     */
+    private void clearSelected() {
+        PictureOverviewController.this.getImagePreviewList().forEach(image -> {
+            image.setIsSelected(false);
+        });
+        PictureOverviewController.this.getSelectedImagePreviewList().clear();
+    }
+
+    /**
+     * description: 清除剪切文件的样式
+     * @param
+     * @return void
+     */
+    private void clearCuted() {
+        cutedImageList.forEach(cutedImage -> {
+            cutedImage.setEffect(null);
+        });
+        cutedImageList.clear();
+    }
+//getter & setter ------------------------------------------------------------------------
+    public void setSelectedDir(File selectedDir) {
+        this.selectedDir.set(selectedDir);
+    }
+
+    public FlowPane getPreviewPane() {
+        return previewPane;
+    }
+
+    public ObservableList<ImagePreViewItem> getImagePreviewList() {
+        return imagePreviewList.get();
+    }
+
+    public SimpleListProperty<ImagePreViewItem> imagePreviewListProperty() {
+        return imagePreviewList;
+    }
+
+    public void setImagePreviewList(ObservableList<ImagePreViewItem> imagePreviewList) {
+        this.imagePreviewList.set(imagePreviewList);
+    }
+
+    public ObservableList<ImagePreViewItem> getSelectedImagePreviewList() {
+        return selectedImagePreviewList.get();
+    }
+
+    public SimpleListProperty<ImagePreViewItem> selectedImagePreviewListProperty() {
+        return selectedImagePreviewList;
+    }
+
+    public void setSelectedImagePreviewList(ObservableList<ImagePreViewItem> selectedImagePreviewList) {
+        this.selectedImagePreviewList.set(selectedImagePreviewList);
+    }
+}
