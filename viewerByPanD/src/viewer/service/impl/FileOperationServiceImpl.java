@@ -240,7 +240,7 @@ public class FileOperationServiceImpl implements FileOperationService {
      */
     private boolean showDeleteAlert(String header,String message) {
         Alert alert = new Alert(
-                Alert.AlertType.CONFIRMATION, header,
+                Alert.AlertType.CONFIRMATION, message,
                 new ButtonType("取消", ButtonBar.ButtonData.NO),
                 new ButtonType("确定", ButtonBar.ButtonData.YES));
 

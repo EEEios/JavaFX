@@ -228,13 +228,13 @@ public class PictureOverviewController {
                 //点击右键打开对应的上下文菜单
                 if (event.getButton() == MouseButton.SECONDARY){
                     contextMenu.getItems().clear();
-                    contextMenu.getItems().addAll(pasteMenuItem, deleteMenuItem, selectAllMenuItem);
+                    contextMenu.getItems().addAll(pasteMenuItem, selectAllMenuItem);
                     contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
                 }
             } else {
                 if (event.getButton() == MouseButton.SECONDARY){
                     contextMenu.getItems().clear();
-                    contextMenu.getItems().addAll(openMenuItem, copyMenuItem, cutMenuItem, pasteMenuItem, renameMenuItem, deleteMenuItem, selectAllMenuItem);
+                    contextMenu.getItems().addAll(openMenuItem, copyMenuItem, cutMenuItem, renameMenuItem, deleteMenuItem);
                     contextMenu.show(previewPane, event.getScreenX(), event.getScreenY());
                 }
             }
@@ -279,6 +279,7 @@ public class PictureOverviewController {
      * @return void
      */
     public void menuItemOfSelectAll() {
+        clearCuted();
         selectedImagePreviewList.clear();
         imagePreviewList.forEach(imagePreViewItem -> {
             imagePreViewItem.setIsSelected(true);
