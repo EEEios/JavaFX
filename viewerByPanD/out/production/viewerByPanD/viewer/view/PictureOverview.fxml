@@ -33,7 +33,7 @@
                                     <Insets bottom="5.0" left="10.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
-                              <Button mnemonicParsing="false" text="删除">
+                              <Button mnemonicParsing="false" onAction="#menuItemOfDelete" text="删除">
                                  <HBox.margin>
                                     <Insets bottom="5.0" top="5.0" />
                                  </HBox.margin>

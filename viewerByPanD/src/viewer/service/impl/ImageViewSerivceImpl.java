@@ -31,23 +31,26 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         imagerViewStage.setHeight(ImageVIewStageConstant.STAGE_PRE_HEIGHT);
 
         //加载控制器
+        ImageViewController imageViewController = new ImageViewController(imageList, firstFile);
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/ImageView.fxml"));
 
             //加载控制器
-            ImageViewController imageViewController = new ImageViewController(imageList, firstFile);
+
             loader.setController(imageViewController);
             AnchorPane pictureOverview = (AnchorPane) loader.load();
 
             Scene scene = new Scene(pictureOverview);
             imagerViewStage.setScene(scene);
 
-            imageViewController.setParentStage(imagerViewStage, true);
+            imageViewController.setParentStage(imagerViewStage);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         imagerViewStage.show();
+        //调整显示的图片样式
+        imageViewController.adjustImageView();
     }
 }

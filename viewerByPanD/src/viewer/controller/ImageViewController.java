@@ -49,7 +49,6 @@ public class ImageViewController {
 
     //容器属性
     private Stage parentStage;
-    private SimpleBooleanProperty isInitialStage;
 
     //第一个要显示的图片，构造方法使用
     private File firstFile;
@@ -75,7 +74,6 @@ public class ImageViewController {
 //        anchorPane.getChildren().addAll(button);
 //        System.out.println("button: " + button.getPrefHeight());
         //图片列表的初始化和装载
-        isInitialStage = new SimpleBooleanProperty(false);
         currentIndex = new SimpleIntegerProperty(0);
         images = new ArrayList<>();
         imageMap = new HashMap<>();
@@ -96,7 +94,6 @@ public class ImageViewController {
 
         //初始化监听
         initialListener();
-
 //        adjustImageView();
     }
 
@@ -105,24 +102,12 @@ public class ImageViewController {
     //不包含stageListener的初始化，stageListener初始化需要等待stage的传入装载，见@setParentStage(Stage parentStage, boolean isInitial)
     private void initialListener() {
         //根据Stage比例调整imageView
-        isInitialStageListener();
         //TODO 未悬浮时隐藏按钮
 //        pageButtonListener();
         currentImageListener();
+
     }
 
-    //根据isInitialScene是否被传入，初始化stageListener()
-    private void isInitialStageListener() {
-        isInitialStage.addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (newValue.booleanValue() == true) {
-                    adjustImageView();
-                    stageListener();
-                }
-            }
-        });
-    }
 
     //Stage属性相关
     public void stageListener() {
@@ -211,13 +196,12 @@ public class ImageViewController {
     }
 
     //根据窗口大小调整ImageView
-    private void adjustImageView() {
+    public void adjustImageView() {
         //Toolbar 高度为43,使用下面的命令查询
 //            System.out.println("ToolBar: " + toolBar.prefHeight(-1));
         double toolBarHeight = toolBar.prefHeight(-1);
         double scenceHeight = parentStage.getScene().getHeight() - toolBarHeight;
         double scenceWidth = parentStage.getScene().getWidth();
-
         if (currentImage.getHeight() < scenceHeight
                 && currentImage.getWidth() < scenceWidth) {
             imageView.setFitHeight(currentImage.getHeight());
@@ -243,8 +227,9 @@ public class ImageViewController {
 
 //getter & setter --------------------------------------------------------------
 
-    public void setParentStage(Stage parentStage, boolean isInitial) {
+    public void setParentStage(Stage parentStage) {
         this.parentStage = parentStage;
-        this.isInitialStage.set(isInitial);
+//        this.isInitialStage.set(isInitial);
+        stageListener();
     }
 }
