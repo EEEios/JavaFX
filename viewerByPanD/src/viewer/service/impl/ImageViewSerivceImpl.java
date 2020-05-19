@@ -26,8 +26,7 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
         imagerViewStage.setMinWidth(ImageVIewStageConstant.STAGE_MIN_WIDTH);
-        imagerViewStage.setMinHeight(ImageVIewStageConstant.STAGE_MIN_HEIGHT);
-        imagerViewStage.setWidth(ImageVIewStageConstant.STAGE_PRE_WIDTH);
+        imagerViewStage.setMinHeight(ImageVIewStageConstant.STAGE_MIN_HEIGHT);        imagerViewStage.setWidth(ImageVIewStageConstant.STAGE_PRE_WIDTH);
         imagerViewStage.setHeight(ImageVIewStageConstant.STAGE_PRE_HEIGHT);
 
         //加载控制器
@@ -50,7 +49,5 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         }
 
         imagerViewStage.show();
-        //调整显示的图片样式，增加了耦合度
-//        imageViewController.adjustImageView();
     }
 }
