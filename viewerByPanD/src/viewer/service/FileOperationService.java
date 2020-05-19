@@ -1,6 +1,7 @@
 package viewer.service;
 
 import javafx.beans.property.SimpleListProperty;
+import javafx.collections.ObservableList;
 import viewer.model.ImagePreViewItem;
 
 import java.io.File;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public interface FileOperationService {
 
-    void rename(List<File> fileList);
+    void rename(ObservableList<ImagePreViewItem> selectedImageList);
 
     void copy(List<File> fileList);
 

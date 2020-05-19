@@ -1,12 +1,16 @@
 package viewer.service.impl;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleListProperty;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
+import javafx.util.Pair;
 import viewer.model.ImagePreViewItem;
 import viewer.service.FileOperationService;
 
@@ -26,8 +30,110 @@ import java.util.Optional;
 public class FileOperationServiceImpl implements FileOperationService {
 
     @Override
-    public void rename(List<File> fileList) {
+    public void rename(ObservableList<ImagePreViewItem> selectedImageList) {
+        if (selectedImageList.size() == 1) {
+            ImagePreViewItem imagefile = selectedImageList.get(0);
+            String extName = imagefile.getImageFile().getName().substring(imagefile.getImageFile().getName().lastIndexOf('.'));
 
+            TextInputDialog dialog = new TextInputDialog(null);
+            dialog.setHeaderText(null);
+            dialog.setTitle("重命名");
+            dialog.setContentText("新文件名(不需要扩展名):");
+
+            File[] images = new File(imagefile.getImageFile().getParent()).listFiles(
+                    pathname -> {
+                        if (pathname.isFile()) {
+                            String name = pathname.getName().toLowerCase();
+                            if (name.endsWith(".jpg") || name.endsWith(".jpge") || name.endsWith(".gif")
+                                    || name.endsWith(".png") || name.endsWith("bmp")) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+            );
+            List<File> fileList = new ArrayList<>();
+            Collections.addAll(fileList, images);
+
+            dialog.showAndWait().ifPresent(response -> {
+
+                if (findSameName(response + extName, fileList)) {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("提示信息");
+                    alert.setHeaderText(null);
+                    alert.setContentText("图片文件重命名失败，请检查是否有同名文件！");
+                    alert.showAndWait();
+                } else {
+                    imagefile.rename(response + extName);
+                }
+
+            });
+        } else {
+            Dialog<Pair<String, Pair<Integer, Integer>>> dialog = new Dialog<>();
+            dialog.setTitle("批量重命名");
+            dialog.setHeaderText(null);
+
+            GridPane grid = new GridPane();
+            grid.setPadding(new Insets(20, 150, 10, 10));
+
+            TextField textFieldFilename = new TextField("NewImage");
+            Spinner<Integer> spinnerStartNumber = new Spinner<>(1, 100, 1);
+            Spinner<Integer> spinnerNumberWidth = new Spinner<>(1, 8, 3);
+
+            Platform.runLater(() -> textFieldFilename.requestFocus());
+
+            grid.add(new Label("统一文件名:"), 0, 0);
+            grid.add(textFieldFilename, 1, 0);
+            grid.add(new Label("起始序号:"), 0, 1);
+            grid.add(spinnerStartNumber, 1, 1);
+            grid.add(new Label("序号位数:"), 0, 2);
+            grid.add(spinnerNumberWidth, 1, 2);
+
+            dialog.getDialogPane().setContent(grid);
+            dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+            textFieldFilename.textProperty().addListener((observable, oldValue, newValue) -> {
+                dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(newValue.trim().isEmpty());
+            });
+
+            dialog.setResultConverter(new Callback<ButtonType, Pair<String, Pair<Integer, Integer>>>() {
+                @Override
+                public Pair<String, Pair<Integer, Integer>> call(ButtonType buttonType) {
+                    if (buttonType == ButtonType.OK) {
+                        Integer start = spinnerStartNumber.getValue();
+                        Integer width = spinnerNumberWidth.getValue();
+                        String newName = textFieldFilename.getText();
+                        return new Pair<String, Pair<Integer, Integer>>(newName,
+                                new Pair<Integer, Integer>(start, width));
+                    }
+                    return null;
+                }
+            });
+
+            dialog.showAndWait().ifPresent(renameValue -> {
+                String newName = renameValue.getKey();
+                Integer start = renameValue.getValue().getKey();
+                Integer width = renameValue.getValue().getValue();
+                int successful = 0;
+                int failure = 0;
+
+                for (ImagePreViewItem ipItem : selectedImageList) {
+                    String extName = ipItem.getImageFile().getName().substring(ipItem.getImageFile().getName().lastIndexOf('.'));
+                    String newFilename = String.format(newName + "%0" + width + "d" + extName, start);
+                    start++;
+                    if (ipItem.rename(newFilename)) {
+                        successful++;
+                    } else {
+                        failure++;
+                    }
+                }
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("提示信息");
+                alert.setHeaderText(null);
+                alert.setContentText(String.format("批量图片文件完成, %d个成功, %d个失败！", successful, failure));
+
+                alert.showAndWait();
+            });
+        }
     }
 
     @Override

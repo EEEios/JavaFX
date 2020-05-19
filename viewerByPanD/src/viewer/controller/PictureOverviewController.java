@@ -303,10 +303,9 @@ public class PictureOverviewController {
      * @param
      * @return void
      */
-    public void menuItemOfRename(List<File> fileList) {
+    public void menuItemOfRename() {
         clearCuted();
-
-        fileOperationService.rename(fileList);
+        fileOperationService.rename(selectedImagePreviewList);
     }
 
     /**

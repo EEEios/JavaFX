@@ -175,6 +175,24 @@ public class ImagePreViewItem extends VBox {
         });
     }
 
+//特性方法 ----------------------------------------------------------------------------
+
+    /**
+     * description: 重命名
+     * @param newName
+     * @return boolean
+     */
+    public boolean rename(String newName) {
+        String absName = imageFile.getParent() + "/" + newName;
+        File dest = new File(absName);
+        if (imageFile.renameTo(dest)) {
+            imageFile = dest;
+            this.nameLabel.setText(imageFile.getName());
+
+            return true;
+        }
+        return false;
+    }
 //getter & setter -------------------------------------------------------------------
     public boolean isIsSelected() {
         return isSelected.get();
