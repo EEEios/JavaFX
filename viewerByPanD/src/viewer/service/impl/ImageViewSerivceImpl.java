@@ -50,7 +50,7 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         }
 
         imagerViewStage.show();
-        //调整显示的图片样式
-        imageViewController.adjustImageView();
+        //调整显示的图片样式，增加了耦合度
+//        imageViewController.adjustImageView();
     }
 }

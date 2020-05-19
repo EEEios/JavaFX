@@ -1,6 +1,7 @@
 package viewer.controller;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -49,7 +50,8 @@ public class ImageViewController {
 
     //容器属性
     private Stage parentStage;
-
+    private double sceneWidth;
+    private double sceneHeight;
     //第一个要显示的图片，构造方法使用
     private File firstFile;
 
@@ -106,6 +108,7 @@ public class ImageViewController {
 //        pageButtonListener();
         currentImageListener();
 
+
     }
 
 
@@ -120,10 +123,35 @@ public class ImageViewController {
         parentStage.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                System.out.println("old height: " + oldValue);
+//                System.out.println("new height: " + newValue);
                 adjustImageView();
             }
         });
     }
+
+    public void sceneListener() {
+        parentStage.getScene().widthProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                System.out.println("old width: " + oldValue);
+//                System.out.println("new width: " + newValue);
+                setSceneWidth(newValue.doubleValue());
+                adjustImageView();
+            }
+        });
+
+        parentStage.getScene().heightProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                System.out.println("old height: " + oldValue);
+//                System.out.println("new height: " + newValue);
+                setSceneHeight(newValue.doubleValue());
+                adjustImageView();
+            }
+        });
+    }
+
 
     //翻页按钮相关
     public void pageButtonListener() {
@@ -199,9 +227,10 @@ public class ImageViewController {
     public void adjustImageView() {
         //Toolbar 高度为43,使用下面的命令查询
 //            System.out.println("ToolBar: " + toolBar.prefHeight(-1));
+
         double toolBarHeight = toolBar.prefHeight(-1);
-        double scenceHeight = parentStage.getScene().getHeight() - toolBarHeight;
-        double scenceWidth = parentStage.getScene().getWidth();
+        double scenceHeight = getSceneHeight() - toolBarHeight;
+        double scenceWidth = getSceneWidth();
         if (currentImage.getHeight() < scenceHeight
                 && currentImage.getWidth() < scenceWidth) {
             imageView.setFitHeight(currentImage.getHeight());
@@ -212,7 +241,6 @@ public class ImageViewController {
             }
             if (scenceHeight < scenceWidth) {
                 imageView.setFitHeight(scenceHeight * ImagePreviewConstant.IMAGE_PROPORTION_IN_STAGE);
-                System.out.println(imageView.getFitHeight());
             }
         }
     }
@@ -230,6 +258,23 @@ public class ImageViewController {
     public void setParentStage(Stage parentStage) {
         this.parentStage = parentStage;
 //        this.isInitialStage.set(isInitial);
-        stageListener();
+//        stageListener();
+        sceneListener();
+    }
+
+    public double getSceneWidth() {
+        return sceneWidth;
+    }
+
+    public void setSceneWidth(double sceneWidth) {
+        this.sceneWidth = sceneWidth;
+    }
+
+    public double getSceneHeight() {
+        return sceneHeight;
+    }
+
+    public void setSceneHeight(double sceneHeight) {
+        this.sceneHeight = sceneHeight;
     }
 }
