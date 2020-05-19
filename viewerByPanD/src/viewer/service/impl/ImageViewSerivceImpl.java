@@ -22,6 +22,7 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
 
     @Override
     public void openImageViewStage(List<File> imageList, File firstFile) {
+        //stage属性设置
         Stage imagerViewStage = new Stage();
         imagerViewStage.setTitle("Picture Viewer");
         imagerViewStage.getIcons().add(new Image("file:resources/images/title.png"));
@@ -34,8 +35,6 @@ public class ImageViewSerivceImpl implements ImageViewSerivce {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("view/ImageView.fxml"));
-
-            //加载控制器
 
             loader.setController(imageViewController);
             AnchorPane pictureOverview = (AnchorPane) loader.load();

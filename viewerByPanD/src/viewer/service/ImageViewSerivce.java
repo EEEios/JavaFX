@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface ImageViewSerivce {
 
-    //打开查看图片页面
+    //打开查看图片页面，进行初始化
     void openImageViewStage(List<File> imageList, File firstFile);
 }

@@ -1,18 +1,25 @@
 package viewer.controller;
 
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
 import viewer.model.DirTreeItem;
@@ -36,16 +43,21 @@ public class PictureOverviewController {
     public ImageViewSerivce imageViewSerivce = ServiceFactory.getImageViewSerivce();
 
     @FXML
+    private ScrollPane scrollPane;
+    //图片预览处的Pane
+    @FXML
     private FlowPane previewPane;
     @FXML
-    private ScrollPane scrollPane;
+    private AnchorPane previewContainer;
+    @FXML
+    private BorderPane scrollPaneContainer;
     //目录树
     @FXML
     private TreeView<File> dirTree;
+
     //上下文菜单
     @FXML
     private ContextMenu contextMenu;
-
     @FXML
     private MenuItem copyMenuItem;
     @FXML
@@ -83,6 +95,10 @@ public class PictureOverviewController {
     private SimpleListProperty<ImagePreViewItem> selectedImagePreviewList;
     //待剪切的图片
     private SimpleListProperty<ImagePreViewItem> cutedImageList;
+    //拖拽产生的矩形框
+    private Rectangle rectangle;
+    private SimpleDoubleProperty rectangleStartX;
+    private SimpleDoubleProperty rectangleStartY;
 //初始化-----------------------------------------------------------------------------------
     @FXML
     public void initialize() {
@@ -91,7 +107,10 @@ public class PictureOverviewController {
         this.selectedImagePreviewList = new SimpleListProperty<>(FXCollections.observableArrayList());
         this.cutedImageList = new SimpleListProperty<>(FXCollections.observableArrayList());
         this.selectedDir = new SimpleObjectProperty<File>();
-
+        this.rectangle = new Rectangle();
+        this.rectangleStartX = new SimpleDoubleProperty();
+        this.rectangleStartY = new SimpleDoubleProperty();
+//        this.scrollPane.setMaxWidth(scrollPaneContainer.getWidth());
         initDirTree();
         initPreview();
     }
@@ -177,6 +196,7 @@ public class PictureOverviewController {
         pathLabel.setText("");
         pathLabelListener();
         selectImageListener();
+        rectangeListener();
     }
 
     /**
@@ -196,6 +216,7 @@ public class PictureOverviewController {
     }
 
 //监听 ------------------------------------------------------------------------------------
+
     /**
      * description: 对路径进行监听
      * @param
@@ -255,6 +276,65 @@ public class PictureOverviewController {
         });
     }
 
+    /**
+     * description: 拖拽产生的矩形框相关的监听
+     * @param
+     * @return void
+     */
+    private void rectangeListener() {
+        previewContainer.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (mouseEvent.getButton().name().equals(MouseButton.PRIMARY.name())) {
+                    System.out.println(mouseEvent.getX());
+                    System.out.println(mouseEvent.getY());
+                    rectangleStartX.set(mouseEvent.getX());
+                    rectangleStartY.set(mouseEvent.getY());
+                    rectangle.setWidth(0);
+                    rectangle.setHeight(0);
+                    previewContainer.getChildren().add(rectangle);
+                }
+            }
+        });
+
+        previewContainer.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (event.getButton() == MouseButton.PRIMARY) {
+                    if (event.getX() > rectangleStartX.doubleValue() && event.getY() > rectangleStartY.doubleValue()) {
+                        AnchorPane.setLeftAnchor(rectangle, rectangleStartX.doubleValue());
+                        AnchorPane.setTopAnchor(rectangle, rectangleStartY.doubleValue());
+                    } else if (event.getX() > rectangleStartX.doubleValue() && event.getY() < rectangleStartY.doubleValue()) {
+                        AnchorPane.setLeftAnchor(rectangle, rectangleStartX.doubleValue());
+                        AnchorPane.setTopAnchor(rectangle, event.getY());
+                    } else if (event.getX() < rectangleStartX.doubleValue() && event.getY() > rectangleStartY.doubleValue()) {
+                        AnchorPane.setLeftAnchor(rectangle, event.getX());
+                        AnchorPane.setTopAnchor(rectangle, rectangleStartY.doubleValue());
+                    } else if (event.getX() < rectangleStartX.doubleValue() && event.getY() < rectangleStartY.doubleValue()) {
+                        AnchorPane.setLeftAnchor(rectangle, event.getX());
+                        AnchorPane.setTopAnchor(rectangle, event.getY());
+                    }
+
+                    if (event.getX() != rectangleStartX.doubleValue() && event.getY() != rectangleStartY.doubleValue()) {
+                        rectangle.setWidth(Math.abs(event.getX() - rectangleStartX.doubleValue()));
+                        rectangle.setHeight(Math.abs(event.getY() - rectangleStartY.doubleValue()));
+                        rectangle.setFill(Paint.valueOf("#AEEEEE"));
+                        rectangle.setStroke(Paint.valueOf("#DC143C"));
+                        rectangle.setOpacity(0.5);
+                    }
+                }
+            }
+        });
+
+        previewContainer.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (rectangle != null) {
+                    previewContainer.getChildren().removeAll(rectangle);
+                }
+            }
+        });
+    }
 //按钮/菜单Action (为 public 以便 fxml 能够读取) ------------------------------------------------------
     /**
      * description: 按钮：返回上级目录
