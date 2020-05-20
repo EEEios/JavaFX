@@ -227,7 +227,6 @@ public class ImageViewController {
     public void adjustImageView() {
         //Toolbar 高度为43,使用下面的命令查询
 //            System.out.println("ToolBar: " + toolBar.prefHeight(-1));
-
         double toolBarHeight = toolBar.prefHeight(-1);
         double scenceHeight = getSceneHeight() - toolBarHeight;
         double scenceWidth = getSceneWidth();

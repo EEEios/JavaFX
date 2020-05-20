@@ -335,6 +335,7 @@ public class PictureOverviewController {
             @Override
             public void handle(MouseEvent mouseEvent) {
                 if (mouseEvent.getButton().name().equals(MouseButton.PRIMARY.name())) {
+                    //TODO 测试代码
                     System.out.println(mouseEvent.getX());
                     System.out.println(mouseEvent.getY());
                     rectangleStartX.set(mouseEvent.getX());
@@ -394,7 +395,6 @@ public class PictureOverviewController {
         sizeChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SizeChoiceBoxItem>() {
             @Override
             public void changed(ObservableValue<? extends SizeChoiceBoxItem> observable, SizeChoiceBoxItem oldValue, SizeChoiceBoxItem newValue) {
-                System.out.println("new:" + newValue);
                 for (ImagePreViewItem image : imagePreviewList) {
                     image.adjustSize(newValue.getWidth(), newValue.getHeight());
                 }
@@ -416,7 +416,6 @@ public class PictureOverviewController {
         //选择目录返回上级时
         if (selectedDir.getValue().getParentFile() != null) {
             setSelectedDir(selectedDir.getValue().getParentFile());
-//            System.out.println("parent file:" + selectedDir.getValue().getPath());
         }
     }
 

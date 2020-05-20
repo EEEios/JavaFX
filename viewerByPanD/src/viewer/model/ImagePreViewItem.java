@@ -79,14 +79,7 @@ public class ImagePreViewItem extends VBox {
         canvas.widthProperty().bind(imageWidth);
         canvas.heightProperty().bind(imageHeight);
 
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        image = new Image("file:" + imageFile.getPath(),
-                imageWidth.getValue() - 10, imageHeight.getValue() - 10,
-                true, true);
-        gc.drawImage(image,
-                (imageWidth.getValue() - image.getWidth()) / 2,
-                (imageHeight.getValue() - image.getHeight()) / 2);
+        adjustSize(imageWidth.getValue(), imageHeight.getValue());
 
         nameLabel.setText(imageFile.getName());
         nameLabel.setPrefWidth(imageWidth.getValue());
