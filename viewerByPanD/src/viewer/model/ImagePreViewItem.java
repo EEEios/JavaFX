@@ -1,6 +1,7 @@
 package viewer.model;
 
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -34,12 +35,24 @@ public class ImagePreViewItem extends VBox {
 
     private SimpleBooleanProperty isSelected;
 
+//缩略图大小 ----------------------------------------------------------------
+    private SimpleDoubleProperty imageWidth;
+    private SimpleDoubleProperty imageHeight;
+
+    private SimpleDoubleProperty mediateWidth;
+    private SimpleDoubleProperty mediateHeight;
 //初始化 -------------------------------------------------------------------
     public ImagePreViewItem(File imageFile, PictureOverviewController pictureOverviewController) {
         super();
-        this.setHeight(ImagePreviewConstant.VBOX_HEIGHT);
-        this.setWidth(ImagePreviewConstant.VBOX_WIDTH);
 
+        imageWidth = new SimpleDoubleProperty();
+        imageHeight = new SimpleDoubleProperty();
+        mediateWidth = new SimpleDoubleProperty();
+        mediateHeight = new SimpleDoubleProperty();
+        imageWidth.bind(mediateWidth);
+        imageHeight.bind(mediateHeight);
+
+        adjustSize(ImagePreviewConstant.SMALL_WIDTH, ImagePreviewConstant.SMALL_HEIGHT);
         this.imageFile = imageFile;
         this.pictureOverviewController = pictureOverviewController;
 
@@ -58,18 +71,18 @@ public class ImagePreViewItem extends VBox {
      * @return void
      */
     private void initImagePreview() {
-        canvas = new Canvas(ImagePreviewConstant.VBOX_HEIGHT, ImagePreviewConstant.VBOX_WIDTH);
+        canvas = new Canvas(imageHeight.getValue(), imageWidth.getValue());
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Image image = new Image("file:" + imageFile.getPath(),
-                ImagePreviewConstant.VBOX_WIDTH - 10, ImagePreviewConstant.VBOX_HEIGHT - 10,
+                imageWidth.getValue() - 10, imageHeight.getValue() - 10,
                 true, true);
         gc.drawImage(image,
-                (ImagePreviewConstant.VBOX_WIDTH - image.getWidth()) / 2,
-                (ImagePreviewConstant.VBOX_HEIGHT - image.getHeight()) / 2);
+                (imageWidth.getValue() - image.getWidth()) / 2,
+                (imageHeight.getValue() - image.getHeight()) / 2);
 
         nameLabel.setText(imageFile.getName());
-        nameLabel.setPrefWidth(ImagePreviewConstant.VBOX_WIDTH);
+        nameLabel.setPrefWidth(imageWidth.getValue());
         nameLabel.setPrefHeight(20);
         nameLabel.setAlignment(Pos.CENTER);
         nameLabel.setTooltip(new Tooltip(imageFile.getName()));
@@ -193,6 +206,17 @@ public class ImagePreViewItem extends VBox {
         }
         return false;
     }
+
+    /**
+     * description: 调整缩略图大小
+     * @param width
+ * @param heigt
+     * @return void
+     */
+    public void adjustSize(double width, double heigt) {
+        this.mediateHeight.setValue(heigt);
+        this.mediateWidth.setValue(width);
+    }
 //getter & setter -------------------------------------------------------------------
     public boolean isIsSelected() {
         return isSelected.get();
@@ -208,5 +232,13 @@ public class ImagePreViewItem extends VBox {
 
     public File getImageFile() {
         return imageFile;
+    }
+
+    public void setImageWidth(double imageWidth) {
+        this.imageWidth.set(imageWidth);
+    }
+
+    public void setImageHeight(double imageHeight) {
+        this.imageHeight.set(imageHeight);
     }
 }

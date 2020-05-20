@@ -21,7 +21,7 @@
                         <AnchorPane prefHeight="21.0" prefWidth="404.0" BorderPane.alignment="CENTER">
                            <children>
                               <Label fx:id="stateLabel" disable="true" prefHeight="21.0" prefWidth="150.0" text="Label" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="5.0" />
-                              <Button fx:id="slidPlayButton" layoutX="329.0" layoutY="8.0" mnemonicParsing="false" text="Button" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
+                              <ChoiceBox layoutX="389.0" layoutY="5.0" prefHeight="23.0" prefWidth="103.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="5.0" />
                            </children>
                         </AnchorPane>
                      </bottom>
@@ -38,7 +38,7 @@
                                     <Insets bottom="5.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
-                              <Button mnemonicParsing="false" text="Button">
+                              <Button fx:id="slidPlayButton" mnemonicParsing="false" text="Button">
                                  <HBox.margin>
                                     <Insets bottom="5.0" top="5.0" />
                                  </HBox.margin>

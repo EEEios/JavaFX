@@ -15,6 +15,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -111,6 +112,7 @@ public class PictureOverviewController {
         this.rectangleStartX = new SimpleDoubleProperty();
         this.rectangleStartY = new SimpleDoubleProperty();
 //        this.scrollPane.setMaxWidth(scrollPaneContainer.getWidth());
+        
         initDirTree();
         initPreview();
     }
@@ -157,6 +159,7 @@ public class PictureOverviewController {
                                     icon = new ImageView(new Image("file:resources/images/folder-open-solid.png", 16, 16, true, true)); // 磁盘
                                 }
                             }
+
                             setGraphic(icon);
                             String name = FileSystemView.getFileSystemView().getSystemDisplayName(item);
                             setText(name);
@@ -194,6 +197,7 @@ public class PictureOverviewController {
     public void initPreview() {
         previewPane.prefWidthProperty().bind(scrollPane.widthProperty());
         pathLabel.setText("");
+        stateLabel.setText("");
         pathLabelListener();
         selectImageListener();
         rectangeListener();
@@ -335,6 +339,7 @@ public class PictureOverviewController {
             }
         });
     }
+
 //按钮/菜单Action (为 public 以便 fxml 能够读取) ------------------------------------------------------
     /**
      * description: 按钮：返回上级目录
@@ -454,10 +459,12 @@ public class PictureOverviewController {
      */
     public void menuItemOfDelete() {
         clearCuted();
-        if (fileOperationService.delete(ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewList))) {
-            //删除成功就移除
-            this.previewPane.getChildren().removeAll(selectedImagePreviewList);
-            selectedImagePreviewList.clear();
+        if (selectedImagePreviewList != null && selectedImagePreviewList.size() != 0) {
+            if (fileOperationService.delete(ConvertUtil.simpleArrayListPropertyToList(selectedImagePreviewList))) {
+                //删除成功就移除
+                this.previewPane.getChildren().removeAll(selectedImagePreviewList);
+                selectedImagePreviewList.clear();
+            }
         }
 
         clearSelected();
@@ -485,11 +492,13 @@ public class PictureOverviewController {
                     return false;
                 }
         );
-        stateLabel.setText(String.format("共 %d 张图片 |", images.length));
-        previewPane.getChildren().clear();
+        if (images != null) {
+            stateLabel.setText(String.format("共 %d 张图片 |", images.length));
+            previewPane.getChildren().clear();
 
-        //加载图片
-        loadPicture(images);
+            //加载图片
+            loadPicture(images);
+        }
     }
 
     /**
