@@ -15,7 +15,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
@@ -23,8 +22,11 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
+import viewer.constants.ImagePreviewConstant;
 import viewer.model.DirTreeItem;
 import viewer.model.ImagePreViewItem;
+import viewer.model.SizeChoiceBoxItem;
 import viewer.service.FileOperationService;
 import viewer.service.ImageViewSerivce;
 import viewer.service.ServiceFactory;
@@ -86,6 +88,10 @@ public class PictureOverviewController {
     //返回上级目录
     @FXML
     private Button backToParentFileButton;
+    @FXML
+    private ChoiceBox<SizeChoiceBoxItem> sizeChoiceBox;
+
+    private ObservableList<SizeChoiceBoxItem> sizeChoice;
 
     //被选中的目录
     private SimpleObjectProperty<File> selectedDir;
@@ -111,10 +117,14 @@ public class PictureOverviewController {
         this.rectangle = new Rectangle();
         this.rectangleStartX = new SimpleDoubleProperty();
         this.rectangleStartY = new SimpleDoubleProperty();
+        this.sizeChoice = FXCollections.observableArrayList();
 //        this.scrollPane.setMaxWidth(scrollPaneContainer.getWidth());
-        
+
+        initSizeChoiceBox();
         initDirTree();
         initPreview();
+        initListener();
+
     }
 
     /**
@@ -198,9 +208,32 @@ public class PictureOverviewController {
         previewPane.prefWidthProperty().bind(scrollPane.widthProperty());
         pathLabel.setText("");
         stateLabel.setText("");
-        pathLabelListener();
-        selectImageListener();
-        rectangeListener();
+    }
+
+    /**
+     * description: 初始化选择预览图大小的choicebox
+     * @param
+     * @return void
+     */
+    private void initSizeChoiceBox() {
+        sizeChoice.add(new SizeChoiceBoxItem("大图标", ImagePreviewConstant.BIG_WIDTH, ImagePreviewConstant.BIG_HEIGHT));
+        sizeChoice.add(new SizeChoiceBoxItem("中等图标", ImagePreviewConstant.MEDIUM_WIDTH, ImagePreviewConstant.MEDIUM_HEIGHT));
+        sizeChoice.add(new SizeChoiceBoxItem("小图标", ImagePreviewConstant.SMALL_WIDTH, ImagePreviewConstant.SMALL_HEIGHT));
+        sizeChoiceBox.getItems().addAll(sizeChoice);
+        sizeChoiceBox.getSelectionModel().select(1);
+
+        sizeChoiceBox.converterProperty().set(new StringConverter<SizeChoiceBoxItem>() {
+            @Override
+            public String toString(SizeChoiceBoxItem object) {
+                return object.getName();
+            }
+
+            @Override
+            public SizeChoiceBoxItem fromString(String string) {
+                return null;
+            }
+        });
+
     }
 
     /**
@@ -220,6 +253,18 @@ public class PictureOverviewController {
     }
 
 //监听 ------------------------------------------------------------------------------------
+
+    /**
+     * description: 负责大部分监听的初始化
+     * @param
+     * @return void
+     */
+    private void initListener() {
+        pathLabelListener();
+        selectImageListener();
+        rectangeListener();
+        sizeChoiceBoxListener();
+    }
 
     /**
      * description: 对路径进行监听
@@ -335,6 +380,23 @@ public class PictureOverviewController {
             public void handle(MouseEvent mouseEvent) {
                 if (rectangle != null) {
                     previewContainer.getChildren().removeAll(rectangle);
+                }
+            }
+        });
+    }
+
+    /**
+     * description: 监听尺寸选择
+     * @param
+     * @return void
+     */
+    private void sizeChoiceBoxListener() {
+        sizeChoiceBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<SizeChoiceBoxItem>() {
+            @Override
+            public void changed(ObservableValue<? extends SizeChoiceBoxItem> observable, SizeChoiceBoxItem oldValue, SizeChoiceBoxItem newValue) {
+                System.out.println("new:" + newValue);
+                for (ImagePreViewItem image : imagePreviewList) {
+                    image.adjustSize(newValue.getWidth(), newValue.getHeight());
                 }
             }
         });
@@ -524,6 +586,7 @@ public class PictureOverviewController {
         });
         cutedImageList.clear();
     }
+
 //getter & setter ------------------------------------------------------------------------
     public void setSelectedDir(File selectedDir) {
         this.selectedDir.set(selectedDir);

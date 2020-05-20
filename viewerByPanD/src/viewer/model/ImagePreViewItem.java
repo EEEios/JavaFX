@@ -26,6 +26,8 @@ public class ImagePreViewItem extends VBox {
 
     private File imageFile;
 
+    private Image image;
+
     private PictureOverviewController pictureOverviewController;
 
 //VBOX中的组件 -------------------------------------------------------------------
@@ -49,10 +51,12 @@ public class ImagePreViewItem extends VBox {
         imageHeight = new SimpleDoubleProperty();
         mediateWidth = new SimpleDoubleProperty();
         mediateHeight = new SimpleDoubleProperty();
+
         imageWidth.bind(mediateWidth);
         imageHeight.bind(mediateHeight);
+        this.mediateHeight.setValue(ImagePreviewConstant.MEDIUM_HEIGHT);
+        this.mediateWidth.setValue(ImagePreviewConstant.MEDIUM_WIDTH);
 
-        adjustSize(ImagePreviewConstant.SMALL_WIDTH, ImagePreviewConstant.SMALL_HEIGHT);
         this.imageFile = imageFile;
         this.pictureOverviewController = pictureOverviewController;
 
@@ -71,10 +75,13 @@ public class ImagePreViewItem extends VBox {
      * @return void
      */
     private void initImagePreview() {
-        canvas = new Canvas(imageHeight.getValue(), imageWidth.getValue());
+        canvas = new Canvas(imageWidth.getValue(), imageHeight.getValue());
+        canvas.widthProperty().bind(imageWidth);
+        canvas.heightProperty().bind(imageHeight);
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
-        Image image = new Image("file:" + imageFile.getPath(),
+        image = new Image("file:" + imageFile.getPath(),
                 imageWidth.getValue() - 10, imageHeight.getValue() - 10,
                 true, true);
         gc.drawImage(image,
@@ -83,6 +90,7 @@ public class ImagePreViewItem extends VBox {
 
         nameLabel.setText(imageFile.getName());
         nameLabel.setPrefWidth(imageWidth.getValue());
+        nameLabel.prefWidthProperty().bind(imageWidth);
         nameLabel.setPrefHeight(20);
         nameLabel.setAlignment(Pos.CENTER);
         nameLabel.setTooltip(new Tooltip(imageFile.getName()));
@@ -216,6 +224,13 @@ public class ImagePreViewItem extends VBox {
     public void adjustSize(double width, double heigt) {
         this.mediateHeight.setValue(heigt);
         this.mediateWidth.setValue(width);
+        canvas.getGraphicsContext2D().clearRect(0,0,width,heigt);
+        image = new Image("file:" + imageFile.getPath(),
+                imageWidth.getValue() - 10, imageHeight.getValue() - 10,
+                true, true);
+        canvas.getGraphicsContext2D().drawImage(image,
+                (imageWidth.getValue() - image.getWidth()) / 2,
+                (imageHeight.getValue() - image.getHeight()) / 2);
     }
 //getter & setter -------------------------------------------------------------------
     public boolean isIsSelected() {
